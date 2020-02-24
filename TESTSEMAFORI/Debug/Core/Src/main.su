@@ -1,0 +1,16 @@
+main.c:95:5:main	112	static
+main.c:190:6:SystemClock_Config	232	static
+main.c:257:13:MX_DFSDM1_Init	8	static
+main.c:295:13:MX_I2C2_Init	8	static
+main.c:341:13:MX_QUADSPI_Init	8	static
+main.c:374:13:MX_SPI3_Init	8	static
+main.c:414:13:MX_USART1_UART_Init	8	static
+main.c:449:13:MX_USART2_UART_Init	8	static
+main.c:484:13:MX_USART3_UART_Init	8	static
+main.c:519:13:MX_USB_OTG_FS_PCD_Init	8	static
+main.c:554:13:MX_GPIO_Init	56	static
+main.c:733:6:StartHighTask	32	static
+main.c:764:6:StartLowTask	24	static
+main.c:786:6:StartNormalTask	32	static
+main.c:820:6:HAL_TIM_PeriodElapsedCallback	16	static
+main.c:837:6:Error_Handler	4	static

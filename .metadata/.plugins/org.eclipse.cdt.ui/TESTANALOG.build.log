@@ -1,0 +1,10 @@
+10:00:09 **** Incremental Build of configuration Debug for project TESTANALOG ****
+make -j12 all 
+arm-none-eabi-size   TESTANALOG.elf 
+   text	   data	    bss	    dec	    hex	filename
+  33320	    124	   7316	  40760	   9f38	TESTANALOG.elf
+Finished building: default.size.stdout
+ 
+
+10:00:10 Build Finished. 0 errors, 0 warnings. (took 1s.295ms)
+

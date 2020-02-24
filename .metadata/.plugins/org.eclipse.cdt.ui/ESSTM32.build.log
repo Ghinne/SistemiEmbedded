@@ -1,0 +1,10 @@
+21:08:10 **** Incremental Build of configuration Debug for project ESSTM32 ****
+make -j12 all 
+arm-none-eabi-size   ESSTM32.elf 
+   text	   data	    bss	    dec	    hex	filename
+  26432	     24	   7216	  33672	   8388	ESSTM32.elf
+Finished building: default.size.stdout
+ 
+
+21:08:11 Build Finished. 0 errors, 0 warnings. (took 1s.508ms)
+

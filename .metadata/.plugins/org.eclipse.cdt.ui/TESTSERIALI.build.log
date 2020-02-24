@@ -1,0 +1,10 @@
+21:08:13 **** Incremental Build of configuration Debug for project TESTSERIALI ****
+make -j12 all 
+arm-none-eabi-size   TESTSERIALI.elf 
+   text	   data	    bss	    dec	    hex	filename
+  25720	     24	   7200	  32944	   80b0	TESTSERIALI.elf
+Finished building: default.size.stdout
+ 
+
+21:08:14 Build Finished. 0 errors, 0 warnings. (took 1s.295ms)
+
