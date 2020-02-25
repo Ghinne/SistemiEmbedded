@@ -1,33 +1,10 @@
-21:32:12 **** Incremental Build of configuration Debug for project TESTSEMAFORI ****
+09:43:16 **** Incremental Build of configuration Debug for project TESTSEMAFORI ****
 make -j12 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DDEBUG -DSTM32L475xx -c -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Core/Inc -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c: In function 'StartHighTask':
-../Core/Src/main.c:740:47: warning: implicit declaration of function 'strlen' [-Wimplicit-function-declaration]
-  HAL_UART_Transmit(&huart1, (uint8_t *) str1, strlen(str1), 100);
-                                               ^~~~~~
-../Core/Src/main.c:740:47: warning: incompatible implicit declaration of built-in function 'strlen'
-../Core/Src/main.c:740:47: note: include '<string.h>' or provide a declaration of 'strlen'
-../Core/Src/main.c: In function 'StartLowTask':
-../Core/Src/main.c:771:47: warning: incompatible implicit declaration of built-in function 'strlen'
-  HAL_UART_Transmit(&huart1, (uint8_t *) str1, strlen(str1), 100);
-                                               ^~~~~~
-../Core/Src/main.c:771:47: note: include '<string.h>' or provide a declaration of 'strlen'
-../Core/Src/main.c: In function 'StartNormalTask':
-../Core/Src/main.c:793:47: warning: incompatible implicit declaration of built-in function 'strlen'
-  HAL_UART_Transmit(&huart1, (uint8_t *) str1, strlen(str1), 100);
-                                               ^~~~~~
-../Core/Src/main.c:793:47: note: include '<string.h>' or provide a declaration of 'strlen'
-arm-none-eabi-g++ -o "TESTSEMAFORI.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\ghine\W.I.P\PROGETTIST32\TESTSEMAFORI\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TESTSEMAFORI.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
-Finished building target: TESTSEMAFORI.elf
- 
-arm-none-eabi-objdump -h -S  TESTSEMAFORI.elf  > "TESTSEMAFORI.list"
 arm-none-eabi-size   TESTSEMAFORI.elf 
    text	   data	    bss	    dec	    hex	filename
   30960	     24	   7336	  38320	   95b0	TESTSEMAFORI.elf
 Finished building: default.size.stdout
  
-Finished building: TESTSEMAFORI.list
- 
 
-21:32:15 Build Finished. 0 errors, 4 warnings. (took 2s.230ms)
+09:43:19 Build Finished. 0 errors, 0 warnings. (took 3s.367ms)
 

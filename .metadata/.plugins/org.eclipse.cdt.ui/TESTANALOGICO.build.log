@@ -1,29 +1,10 @@
-10:29:32 **** Incremental Build of configuration Debug for project TESTANALOGICO ****
+09:43:12 **** Incremental Build of configuration Debug for project TESTANALOGICO ****
 make -j12 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DDEBUG -DSTM32L475xx -c -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Core/Inc -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c: In function 'StartSerialAnalog':
-../Core/Src/main.c:765:47: warning: implicit declaration of function 'strlen' [-Wimplicit-function-declaration]
-   HAL_UART_Transmit(&huart1, (uint8_t *) msg, strlen(msg), HAL_MAX_DELAY);
-                                               ^~~~~~
-../Core/Src/main.c:765:47: warning: incompatible implicit declaration of built-in function 'strlen'
-../Core/Src/main.c:765:47: note: include '<string.h>' or provide a declaration of 'strlen'
-../Core/Src/main.c:764:27: warning: 'Light Panel 1 = ' directive writing 16 bytes into a region of size 10 [-Wformat-overflow=]
-   sprintf(msg, "Light Panel 1 = %hu\r\n", raw);
-                 ~~~~~~~~~~^~~~~~
-../Core/Src/main.c:764:3: note: 'sprintf' output between 20 and 24 bytes into a destination of size 10
-   sprintf(msg, "Light Panel 1 = %hu\r\n", raw);
-   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-arm-none-eabi-g++ -o "TESTANALOGICO.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\ghine\W.I.P\PROGETTIST32\TESTANALOGICO\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TESTANALOGICO.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
-Finished building target: TESTANALOGICO.elf
- 
-arm-none-eabi-objdump -h -S  TESTANALOGICO.elf  > "TESTANALOGICO.list"
 arm-none-eabi-size   TESTANALOGICO.elf 
    text	   data	    bss	    dec	    hex	filename
   33076	    124	   7308	  40508	   9e3c	TESTANALOGICO.elf
 Finished building: default.size.stdout
  
-Finished building: TESTANALOGICO.list
- 
 
-10:29:34 Build Finished. 0 errors, 3 warnings. (took 2s.455ms)
+09:43:15 Build Finished. 0 errors, 0 warnings. (took 3s.199ms)
 

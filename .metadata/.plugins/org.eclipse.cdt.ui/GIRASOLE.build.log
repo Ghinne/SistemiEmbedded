@@ -1,0 +1,31 @@
+18:35:52 **** Incremental Build of configuration Debug for project GIRASOLE ****
+make -j12 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DDEBUG -DSTM32L475xx -c -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Core/Inc -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'StartReadPanels':
+../Core/Src/main.c:875:49: warning: implicit declaration of function 'strlen' [-Wimplicit-function-declaration]
+     HAL_UART_Transmit(&huart1, (uint8_t *) msg, strlen(msg), HAL_MAX_DELAY);
+                                                 ^~~~~~
+../Core/Src/main.c:875:49: warning: incompatible implicit declaration of built-in function 'strlen'
+../Core/Src/main.c:875:49: note: include '<string.h>' or provide a declaration of 'strlen'
+../Core/Src/main.c:873:63: warning: '
+
+Light Panel Left = ' directive writing 21 bytes into a region of size between 15 and 19 [-Wformat-overflow=]
+     sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\n", rightPanelValue, leftPanelValue);
+                                          ~~~~~~~~~~~~~~~~~~~~~^~
+../Core/Src/main.c:873:5: note: 'sprintf' output between 46 and 54 bytes into a destination of size 40
+     sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\n", rightPanelValue, leftPanelValue);
+     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-g++ -o "GIRASOLE.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\ghine\W.I.P\PROGETTIST32\GIRASOLE\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="GIRASOLE.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+Finished building target: GIRASOLE.elf
+ 
+arm-none-eabi-objdump -h -S  GIRASOLE.elf  > "GIRASOLE.list"
+arm-none-eabi-size   GIRASOLE.elf 
+   text	   data	    bss	    dec	    hex	filename
+  38668	    124	   7188	  45980	   b39c	GIRASOLE.elf
+Finished building: default.size.stdout
+ 
+Finished building: GIRASOLE.list
+ 
+
+18:35:55 Build Finished. 0 errors, 3 warnings. (took 2s.975ms)
+
