@@ -870,9 +870,11 @@ void startReadPD() {
 		osSemaphoreRelease(PanelsDataReadHandle);
 	} else
 		cpd.nrW++;
-	osSemaphoreWait(PanelsDataReadHandle, osWaitForever);
+
 	// Release mutex
 	osMutexRelease(MutexPDHandle);
+	//Sem read wait
+	osSemaphoreWait(PanelsDataReadHandle, osWaitForever);
 }
 
 /** Function to lock panels data on write */
@@ -886,9 +888,10 @@ void startWritePD() {
 	} else
 		cpd.nwW++;
 
-	osSemaphoreWait(PanelsDataWriteHandle, osWaitForever);
 	// Release mutex
 	osMutexRelease(MutexPDHandle);
+	// Sem write wait
+	osSemaphoreWait(PanelsDataWriteHandle, osWaitForever);
 }
 
 /** Function to unlock panels data from read */
@@ -993,7 +996,7 @@ void StartSerialDebug(void const * argument)
   	startReadPD();
 
   	// Get data
-	sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThresh = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold);
+	sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %hu\r\nVar = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
 
 	// Unlock data reads semaphore
 	endReadPD();
