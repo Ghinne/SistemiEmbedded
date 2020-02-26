@@ -5450,3 +5450,127 @@ Finished building: default.size.stdout
  
 Finished building: GIRASOLE2.list
  
+10:03:43 **** Incremental Build of configuration Debug for project GIRASOLE2 ****
+make -j12 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DDEBUG -DSTM32L475xx -c -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Core/Inc -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'StartSerialDebug':
+../Core/Src/main.c:999:2: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThresh = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold);
+  ^~~~~~~
+../Core/Src/main.c:999:2: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:999:2: note: include '<stdio.h>' or provide a declaration of 'sprintf'
+../Core/Src/main.c:1005:46: warning: implicit declaration of function 'strlen' [-Wimplicit-function-declaration]
+  HAL_UART_Transmit(&huart1, (uint8_t *) msg, strlen(msg), HAL_MAX_DELAY);
+                                              ^~~~~~
+../Core/Src/main.c:1005:46: warning: incompatible implicit declaration of built-in function 'strlen'
+../Core/Src/main.c:1005:46: note: include '<string.h>' or provide a declaration of 'strlen'
+../Core/Src/main.c: In function 'StartLedsTask':
+../Core/Src/main.c:1037:8: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+    if (abs(rpv-lpv)<var || (rpv>th && lpv>th))
+        ^~~
+../Core/Src/main.c: In function 'StartSerialDebug':
+../Core/Src/main.c:999:74: warning: '
+
+Thresh = ' directive writing 11 bytes into a region of size between 0 and 7 [-Wformat-overflow=]
+  sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThresh = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold);
+                                                                 ~~~~~~~~~^~~~
+../Core/Src/main.c:999:15: note: using the range [0, 65535] for directive argument
+  sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThresh = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold);
+               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:999:2: note: 'sprintf' output between 58 and 70 bytes into a destination of size 50
+  sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThresh = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold);
+  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-g++ -o "GIRASOLE2.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\ghine\W.I.P\PROGETTIST32\GIRASOLE2\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="GIRASOLE2.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+Finished building target: GIRASOLE2.elf
+ 
+arm-none-eabi-objdump -h -S  GIRASOLE2.elf  > "GIRASOLE2.list"
+arm-none-eabi-size   GIRASOLE2.elf 
+   text	   data	    bss	    dec	    hex	filename
+  40064	    124	   7476	  47664	   ba30	GIRASOLE2.elf
+Finished building: default.size.stdout
+ 
+Finished building: GIRASOLE2.list
+ 
+10:09:45 **** Incremental Build of configuration Debug for project GIRASOLE2 ****
+make -j12 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DDEBUG -DSTM32L475xx -c -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Core/Inc -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'StartSerialDebug':
+../Core/Src/main.c:999:2: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %Var = %hu\r\nhu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
+  ^~~~~~~
+../Core/Src/main.c:999:2: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:999:2: note: include '<stdio.h>' or provide a declaration of 'sprintf'
+../Core/Src/main.c:999:76: warning: unknown conversion type character 'V' in format [-Wformat=]
+  sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %Var = %hu\r\nhu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
+                                                                            ^
+../Core/Src/main.c:999:15: warning: too many arguments for format [-Wformat-extra-args]
+  sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %Var = %hu\r\nhu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
+               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1005:46: warning: implicit declaration of function 'strlen' [-Wimplicit-function-declaration]
+  HAL_UART_Transmit(&huart1, (uint8_t *) msg, strlen(msg), HAL_MAX_DELAY);
+                                              ^~~~~~
+../Core/Src/main.c:1005:46: warning: incompatible implicit declaration of built-in function 'strlen'
+../Core/Src/main.c:1005:46: note: include '<string.h>' or provide a declaration of 'strlen'
+../Core/Src/main.c: In function 'StartLedsTask':
+../Core/Src/main.c:1037:8: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+    if (abs(rpv-lpv)<var || (rpv>th && lpv>th))
+        ^~~
+../Core/Src/main.c: In function 'StartSerialDebug':
+../Core/Src/main.c:999:74: warning: '
+
+Thr = ' directive writing 8 bytes into a region of size between 0 and 7 [-Wformat-overflow=]
+  sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %Var = %hu\r\nhu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
+                                                                 ~~~~~~~~~^
+arm-none-eabi-g++ -o "GIRASOLE2.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\ghine\W.I.P\PROGETTIST32\GIRASOLE2\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="GIRASOLE2.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+Finished building target: GIRASOLE2.elf
+ 
+arm-none-eabi-objdump -h -S  GIRASOLE2.elf  > "GIRASOLE2.list"
+arm-none-eabi-size   GIRASOLE2.elf 
+   text	   data	    bss	    dec	    hex	filename
+  40088	    124	   7476	  47688	   ba48	GIRASOLE2.elf
+Finished building: default.size.stdout
+ 
+Finished building: GIRASOLE2.list
+ 
+10:11:40 **** Incremental Build of configuration Debug for project GIRASOLE2 ****
+make -j12 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DDEBUG -DSTM32L475xx -c -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Core/Inc -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'StartSerialDebug':
+../Core/Src/main.c:999:2: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %hu\r\nVar = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
+  ^~~~~~~
+../Core/Src/main.c:999:2: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:999:2: note: include '<stdio.h>' or provide a declaration of 'sprintf'
+../Core/Src/main.c:1005:46: warning: implicit declaration of function 'strlen' [-Wimplicit-function-declaration]
+  HAL_UART_Transmit(&huart1, (uint8_t *) msg, strlen(msg), HAL_MAX_DELAY);
+                                              ^~~~~~
+../Core/Src/main.c:1005:46: warning: incompatible implicit declaration of built-in function 'strlen'
+../Core/Src/main.c:1005:46: note: include '<string.h>' or provide a declaration of 'strlen'
+../Core/Src/main.c: In function 'StartLedsTask':
+../Core/Src/main.c:1037:8: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+    if (abs(rpv-lpv)<var || (rpv>th && lpv>th))
+        ^~~
+../Core/Src/main.c: In function 'StartSerialDebug':
+../Core/Src/main.c:999:74: warning: '
+
+Thr = ' directive writing 8 bytes into a region of size between 0 and 7 [-Wformat-overflow=]
+  sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %hu\r\nVar = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
+                                                                 ~~~~~~~~~^
+../Core/Src/main.c:999:15: note: using the range [0, 65535] for directive argument
+  sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %hu\r\nVar = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
+               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:999:15: note: using the range [0, 65535] for directive argument
+../Core/Src/main.c:999:2: note: 'sprintf' output between 64 and 80 bytes into a destination of size 50
+  sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %hu\r\nVar = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
+  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-g++ -o "GIRASOLE2.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\ghine\W.I.P\PROGETTIST32\GIRASOLE2\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="GIRASOLE2.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+Finished building target: GIRASOLE2.elf
+ 
+arm-none-eabi-objdump -h -S  GIRASOLE2.elf  > "GIRASOLE2.list"
+arm-none-eabi-size   GIRASOLE2.elf 
+   text	   data	    bss	    dec	    hex	filename
+  40088	    124	   7476	  47688	   ba48	GIRASOLE2.elf
+Finished building: default.size.stdout
+ 
+Finished building: GIRASOLE2.list
+ 

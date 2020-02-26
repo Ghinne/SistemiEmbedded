@@ -865,7 +865,7 @@ void startReadPD() {
 	// Lock mutex
 	osMutexWait(MutexPDHandle, osWaitForever);
 	// Lock semaphore on read if possible
-	if (!cpd.nw && !cpd.nr) {
+	if (!cpd.nw) {
 		cpd.nr++;
 		osSemaphoreRelease(PanelsDataReadHandle);
 	} else
