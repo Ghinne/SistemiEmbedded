@@ -47,13 +47,16 @@ default.size.stdout \
 OBJDUMP_LIST += \
 TEST\ LED.list \
 
+OBJCOPY_BIN += \
+TEST\ LED.bin \
+
 
 # All Target
 all: TEST\ LED.elf secondary-outputs
 
 # Tool invocations
-TEST\ LED.elf: $(OBJS) $(USER_OBJS) C:\Users\ghine\W.I.P\PROGETTIST32\TEST\ LED\STM32L475VGTX_FLASH.ld
-	arm-none-eabi-g++ -o "TEST LED.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\ghine\W.I.P\PROGETTIST32\TEST LED\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TEST LED.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+TEST\ LED.elf: $(OBJS) $(USER_OBJS) C:\Users\gabriele\Desktop\develop\SistemiEmbedded\TEST\ LED\STM32L475VGTX_FLASH.ld
+	arm-none-eabi-g++ -o "TEST LED.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\gabriele\Desktop\develop\SistemiEmbedded\TEST LED\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TEST LED.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -67,12 +70,17 @@ TEST\ LED.list: $(EXECUTABLES)
 	@echo 'Finished building: $@'
 	@echo ' '
 
+TEST\ LED.bin: $(EXECUTABLES)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "TEST LED.bin"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
 	-$(RM) *
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_BIN)
 
 .PHONY: all clean dependents
 .SECONDARY:

@@ -34,6 +34,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -58,13 +59,20 @@ UART_HandleTypeDef huart3;
 
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
-osThreadId ReadPanelsHandle;
+osThreadId ReadLeftPanelHandle;
 osThreadId SerialDebugHandle;
-osThreadId LedsTaskHandle;
 osThreadId SyncButtonTaskHandle;
+osThreadId ReadRightPanelHandle;
+osThreadId ledTask1Handle;
+osThreadId ledTask2Handle;
+osThreadId ledTask3Handle;
 osMutexId MutexPDHandle;
-osSemaphoreId PanelsDataReadHandle;
-osSemaphoreId PanelsDataWriteHandle;
+osMutexId panelsMutexHandle;
+osSemaphoreId rpanel_semHandle;
+osSemaphoreId lpanel_semHandle;
+osSemaphoreId led1_semHandle;
+osSemaphoreId led2_semHandle;
+osSemaphoreId led3_semHandle;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -81,10 +89,13 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_ADC2_Init(void);
-void StartReadPanels(void const * argument);
+void StartReadLeftPanel(void const * argument);
 void StartSerialDebug(void const * argument);
-void StartLedsTask(void const * argument);
 void StartSynkButton(void const * argument);
+void StartReadRightPanel(void const * argument);
+void StartLedTask1(void const * argument);
+void StartLedTask2(void const * argument);
+void StartLedTask3(void const * argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -102,18 +113,24 @@ struct panelsData {
 void panelDataInit() {
 	pd.leftPanelValue = 0;
 	pd.rightPanelValue = 0;
-	pd.threshold = 50;
-	pd.variation = 50;
+	pd.threshold = 10;
+	pd.variation = 10;
 }
 
-// Control structure for read/write on panels data
-struct controlRWPD {
-	int nr, nw, nrW, nwW;
-} cpd;
+//Structure for precedence constraints management
+struct prec_control {
+	int lpw, rpw;
+	int l1w, l2w, l3w;
+	int lpanel_done, rpanel_done;
+	int led1_done, led2_done, led3_done;
+} pcm;
 
-// Function to initialize control structure
-void controlRWPDInit() {
-	cpd.nr = cpd.nw = cpd.nrW = cpd.nwW = 0;
+void prec_control_manag_init()
+{
+	pcm.lpw = pcm.rpw = 0;
+	pcm.l1w = pcm.l2w = pcm.l3w = 0;
+	pcm.lpanel_done = pcm.rpanel_done = 0;
+	pcm.led1_done = pcm.led2_done = pcm.led3_done = 1;
 }
 
 // Variable on 1 if button has been pressed
@@ -131,9 +148,8 @@ int main(void)
 	// Initialize panels data structure
 	panelDataInit();
 	// Initialize control data structure
-	controlRWPDInit();
+	prec_control_manag_init();
   /* USER CODE END 1 */
-  
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -171,18 +187,35 @@ int main(void)
   osMutexDef(MutexPD);
   MutexPDHandle = osMutexCreate(osMutex(MutexPD));
 
+  /* definition and creation of panelsMutex */
+  osMutexDef(panelsMutex);
+  panelsMutexHandle = osMutexCreate(osMutex(panelsMutex));
+
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
+  //osMutexWait(panelsMutexHandle, osWaitForever);
   /* USER CODE END RTOS_MUTEX */
 
   /* Create the semaphores(s) */
-  /* definition and creation of PanelsDataRead */
-  osSemaphoreDef(PanelsDataRead);
-  PanelsDataReadHandle = osSemaphoreCreate(osSemaphore(PanelsDataRead), 1);
+  /* definition and creation of rpanel_sem */
+  osSemaphoreDef(rpanel_sem);
+  rpanel_semHandle = osSemaphoreCreate(osSemaphore(rpanel_sem), 1);
 
-  /* definition and creation of PanelsDataWrite */
-  osSemaphoreDef(PanelsDataWrite);
-  PanelsDataWriteHandle = osSemaphoreCreate(osSemaphore(PanelsDataWrite), 1);
+  /* definition and creation of lpanel_sem */
+  osSemaphoreDef(lpanel_sem);
+  lpanel_semHandle = osSemaphoreCreate(osSemaphore(lpanel_sem), 1);
+
+  /* definition and creation of led1_sem */
+  osSemaphoreDef(led1_sem);
+  led1_semHandle = osSemaphoreCreate(osSemaphore(led1_sem), 1);
+
+  /* definition and creation of led2_sem */
+  osSemaphoreDef(led2_sem);
+  led2_semHandle = osSemaphoreCreate(osSemaphore(led2_sem), 1);
+
+  /* definition and creation of led3_sem */
+  osSemaphoreDef(led3_sem);
+  led3_semHandle = osSemaphoreCreate(osSemaphore(led3_sem), 1);
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
@@ -197,21 +230,33 @@ int main(void)
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* definition and creation of ReadPanels */
-  osThreadDef(ReadPanels, StartReadPanels, osPriorityNormal, 0, 128);
-  ReadPanelsHandle = osThreadCreate(osThread(ReadPanels), NULL);
+  /* definition and creation of ReadLeftPanel */
+  osThreadDef(ReadLeftPanel, StartReadLeftPanel, osPriorityNormal, 0, 128);
+  ReadLeftPanelHandle = osThreadCreate(osThread(ReadLeftPanel), NULL);
 
   /* definition and creation of SerialDebug */
   osThreadDef(SerialDebug, StartSerialDebug, osPriorityNormal, 0, 128);
   SerialDebugHandle = osThreadCreate(osThread(SerialDebug), NULL);
 
-  /* definition and creation of LedsTask */
-  osThreadDef(LedsTask, StartLedsTask, osPriorityBelowNormal, 0, 128);
-  LedsTaskHandle = osThreadCreate(osThread(LedsTask), NULL);
-
   /* definition and creation of SyncButtonTask */
   osThreadDef(SyncButtonTask, StartSynkButton, osPriorityAboveNormal, 0, 128);
   SyncButtonTaskHandle = osThreadCreate(osThread(SyncButtonTask), NULL);
+
+  /* definition and creation of ReadRightPanel */
+  osThreadDef(ReadRightPanel, StartReadRightPanel, osPriorityNormal, 0, 128);
+  ReadRightPanelHandle = osThreadCreate(osThread(ReadRightPanel), NULL);
+
+  /* definition and creation of ledTask1 */
+  osThreadDef(ledTask1, StartLedTask1, osPriorityNormal, 0, 128);
+  ledTask1Handle = osThreadCreate(osThread(ledTask1), NULL);
+
+  /* definition and creation of ledTask2 */
+  osThreadDef(ledTask2, StartLedTask2, osPriorityNormal, 0, 128);
+  ledTask2Handle = osThreadCreate(osThread(ledTask2), NULL);
+
+  /* definition and creation of ledTask3 */
+  osThreadDef(ledTask3, StartLedTask3, osPriorityNormal, 0, 128);
+  ledTask3Handle = osThreadCreate(osThread(ledTask3), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -219,9 +264,8 @@ int main(void)
 
   /* Start scheduler */
   osKernelStart();
-  
+ 
   /* We should never get here as control is now taken by the scheduler */
-
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -339,6 +383,7 @@ static void MX_ADC1_Init(void)
   hadc1.Init.ContinuousConvMode = DISABLE;
   hadc1.Init.NbrOfConversion = 1;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.NbrOfDiscConversion = 1;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc1.Init.DMAContinuousRequests = DISABLE;
@@ -402,6 +447,7 @@ static void MX_ADC2_Init(void)
   hadc2.Init.ContinuousConvMode = DISABLE;
   hadc2.Init.NbrOfConversion = 1;
   hadc2.Init.DiscontinuousConvMode = DISABLE;
+  hadc2.Init.NbrOfDiscConversion = 1;
   hadc2.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc2.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc2.Init.DMAContinuousRequests = DISABLE;
@@ -483,7 +529,7 @@ static void MX_I2C2_Init(void)
 
   /* USER CODE END I2C2_Init 1 */
   hi2c2.Instance = I2C2;
-  hi2c2.Init.Timing = 0x10909CEC;
+  hi2c2.Init.Timing = 0x00000E14;
   hi2c2.Init.OwnAddress1 = 0;
   hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -853,125 +899,190 @@ static void MX_GPIO_Init(void)
   HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
-  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 3, 0);
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
 
 /* USER CODE BEGIN 4 */
+void PostLedTasks()
+{
+    if (pcm.l1w)
+    {
+        pcm.l1w--;
+        osSemaphoreRelease(led1_semHandle);
+    }
 
-/** Function to lock panels data on read */
-void startReadPD() {
-	// Lock mutex
-	osMutexWait(MutexPDHandle, osWaitForever);
-	// Lock semaphore on read if possible
-	if (!cpd.nw) {
-		cpd.nr++;
-		osSemaphoreRelease(PanelsDataReadHandle);
-	} else
-		cpd.nrW++;
+    if (pcm.l2w)
+    {
+        pcm.l2w--;
+        osSemaphoreRelease(led2_semHandle);
+    }
 
-	// Release mutex
-	osMutexRelease(MutexPDHandle);
-	//Sem read wait
-	osSemaphoreWait(PanelsDataReadHandle, osWaitForever);
+    if (pcm.l3w)
+    {
+        pcm.l3w--;
+        osSemaphoreRelease(led3_semHandle);
+    }
 }
 
-/** Function to lock panels data on write */
-void startWritePD() {
-	// Lock mutex
-	osMutexWait(MutexPDHandle, osWaitForever);
-	// Lock semaphore on write if possible
-	if (!cpd.nw && !cpd.nr && !cpd.nwW) {
-		cpd.nw = 1;
-		osSemaphoreRelease(PanelsDataWriteHandle);
-	} else
-		cpd.nwW++;
+void PostPanelTasks()
+{
+    if (pcm.lpw)
+    {
+        pcm.lpw--;
+        osSemaphoreRelease(lpanel_semHandle);
+    }
 
-	// Release mutex
-	osMutexRelease(MutexPDHandle);
-	// Sem write wait
-	osSemaphoreWait(PanelsDataWriteHandle, osWaitForever);
+    if (pcm.rpw)
+    {
+        pcm.rpw--;
+        osSemaphoreRelease(rpanel_semHandle);
+    }
 }
 
-/** Function to unlock panels data from read */
-void endReadPD() {
-	// Lock mutex
+void ReadLPStart()
+{
 	osMutexWait(MutexPDHandle, osWaitForever);
-	// Decrease readers counter and unlock semaphore if 0
-	cpd.nr--;
-	if (!cpd.nr) {
-		if (cpd.nwW) {
-			cpd.nwW--;
-			cpd.nw = 1;
-			osSemaphoreRelease(PanelsDataWriteHandle);
-		} else while (cpd.nrW) {
-			cpd.nrW--;
-			cpd.nr++;
-			osSemaphoreRelease(PanelsDataReadHandle);
-		}
+	if (pcm.lpanel_done)
+		pcm.lpw++;
+	else
+		osSemaphoreRelease(lpanel_semHandle);
+	osMutexRelease(MutexPDHandle);
+	osSemaphoreWait(lpanel_semHandle, osWaitForever);
+}
+
+void ReadLPEnd()
+{
+	osMutexWait(MutexPDHandle, osWaitForever);
+	pcm.lpanel_done = 1;
+	if (pcm.lpanel_done && pcm.rpanel_done)
+    {
+		pcm.led1_done = pcm.led2_done = pcm.led3_done = 0; //indico che devono eseguire i led
+	    PostLedTasks();
+	 }
+	osMutexRelease(MutexPDHandle);
+}
+
+void ReadRPStart()
+{
+	osMutexWait(MutexPDHandle, osWaitForever);
+	if (pcm.rpanel_done)
+		pcm.rpw++;
+	else
+		osSemaphoreRelease(rpanel_semHandle);
+	osMutexRelease(MutexPDHandle);
+	osSemaphoreWait(rpanel_semHandle, osWaitForever);
+}
+
+void ReadRPEnd()
+{
+	osMutexWait(MutexPDHandle, osWaitForever);
+	pcm.rpanel_done = 1;
+	if (pcm.lpanel_done && pcm.rpanel_done)
+	{
+		pcm.led1_done = pcm.led2_done = pcm.led3_done = 0; //indico che devono eseguire i led
+		PostLedTasks();
 	}
-	// Release mutex
 	osMutexRelease(MutexPDHandle);
 }
 
-/** Function to unlock panels data from write */
-void endWritePD() {
-	// Lock mutex
+void WriteL1Start()
+{
 	osMutexWait(MutexPDHandle, osWaitForever);
-	// Unlock semaphore
-	cpd.nw = 0;
-	if (cpd.nwW) {
-		cpd.nwW--;
-		cpd.nw = 1;
-		osSemaphoreRelease(PanelsDataWriteHandle);
-	} else while (cpd.nrW) {
-		cpd.nrW--;
-		cpd.nr++;
-		osSemaphoreRelease(PanelsDataReadHandle);
+	if (pcm.led1_done)
+		pcm.l1w++;
+	else
+		osSemaphoreRelease(led1_semHandle);
+	osMutexRelease(MutexPDHandle);
+	osSemaphoreWait(led1_semHandle, osWaitForever);
+}
+
+void WriteL2Start()
+{
+	osMutexWait(MutexPDHandle, osWaitForever);
+	if (pcm.led2_done)
+		pcm.l2w++;
+	else
+		osSemaphoreRelease(led2_semHandle);
+	osMutexRelease(MutexPDHandle);
+	osSemaphoreWait(led2_semHandle, osWaitForever);
+}
+
+void WriteL3Start()
+{
+	osMutexWait(MutexPDHandle, osWaitForever);
+	if (pcm.led3_done)
+		pcm.l3w++;
+	else
+		osSemaphoreRelease(led3_semHandle);
+	osMutexRelease(MutexPDHandle);
+	osSemaphoreWait(led3_semHandle, osWaitForever);
+}
+
+void WriteL1End()
+{
+	osMutexWait(MutexPDHandle, osWaitForever);
+	pcm.led1_done = 1;
+	if (pcm.led1_done && pcm.led2_done && pcm.led3_done)
+	{
+		pcm.lpanel_done = pcm.rpanel_done = 0; //sblocco i pannelli
+		PostPanelTasks();
 	}
-	// Release mutex
 	osMutexRelease(MutexPDHandle);
 }
 
+void WriteL2End()
+{
+	osMutexWait(MutexPDHandle, osWaitForever);
+	pcm.led2_done = 1;
+	if (pcm.led1_done && pcm.led2_done && pcm.led3_done)
+	{
+		pcm.lpanel_done = pcm.rpanel_done = 0; //sblocco i pannelli
+		PostPanelTasks();
+	}
+	osMutexRelease(MutexPDHandle);
+}
+
+void WriteL3End()
+{
+	osMutexWait(MutexPDHandle, osWaitForever);
+	pcm.led3_done = 1;
+	if (pcm.led1_done && pcm.led2_done && pcm.led3_done)
+	{
+		pcm.lpanel_done = pcm.rpanel_done = 0; //sblocco i pannelli
+		PostPanelTasks();
+	}
+	osMutexRelease(MutexPDHandle);
+}
 
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_StartReadPanels */
+/* USER CODE BEGIN Header_StartReadLeftPanel */
 /**
-  * @brief  Function implementing the ReadPanels thread.
+  * @brief  Function implementing the ReadLeftPanel thread.
   * @param  argument: Not used 
   * @retval None
   */
-/* USER CODE END Header_StartReadPanels */
-void StartReadPanels(void const * argument)
+/* USER CODE END Header_StartReadLeftPanel */
+void StartReadLeftPanel(void const * argument)
 {
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
-  for(;;)
-  {
-	  // Get right panel value
-	  HAL_ADC_Start(&hadc1);
-	  HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
-	  uint16_t rightPanelValue = HAL_ADC_GetValue(&hadc1)*100/2400;
 
-	  // Get left panel value
-	  HAL_ADC_Start(&hadc2);
-	  HAL_ADC_PollForConversion(&hadc2, HAL_MAX_DELAY);
-	  uint16_t leftPanelValue = HAL_ADC_GetValue(&hadc2)*100/2400;
+	for(;;)
+	{
+		ReadLPStart();
 
-	  /** Update panel data structure values **/
-	  // Lock data writes semaphore
-	  startWritePD();
+		 // Get left panel value
+		HAL_ADC_Start(&hadc2);
+		HAL_ADC_PollForConversion(&hadc2, HAL_MAX_DELAY);
+		pd.leftPanelValue = HAL_ADC_GetValue(&hadc2)*100/2400;
 
-	  // Change values
-	  pd.rightPanelValue = rightPanelValue;
-	  pd.leftPanelValue = leftPanelValue;
+		ReadLPEnd();
 
-	  // Unlock data writes semaphore
-	  endWritePD();
-	  // Delay time (msec)
-	  osDelay(1000);
+		// Delay time (msec)
+		osDelay(100);
   }
   /* USER CODE END 5 */ 
 }
@@ -993,13 +1104,13 @@ void StartSerialDebug(void const * argument)
 
 	/** Update panel data structure values **/
 	// Lock data reads semaphore
-  	startReadPD();
+  	//startReadPD(); DISABILITATO TEMPORANEAMENTE
 
   	// Get data
 	sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %hu\r\nVar = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
 
 	// Unlock data reads semaphore
-	endReadPD();
+	//endReadPD();
 
 	// Print data
 	HAL_UART_Transmit(&huart1, (uint8_t *) msg, strlen(msg), HAL_MAX_DELAY);
@@ -1008,45 +1119,6 @@ void StartSerialDebug(void const * argument)
 	osDelay(3000);
   }
   /* USER CODE END StartSerialDebug */
-}
-
-/* USER CODE BEGIN Header_StartLedsTask */
-/**
-* @brief Function implementing the LedsTask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartLedsTask */
-void StartLedsTask(void const * argument)
-{
-  /* USER CODE BEGIN StartLedsTask */
-  /* Infinite loop */
-  for(;;)
-  {
-	  // Lock data reads semaphore
-	  startReadPD();
-	  // Get data
-	  int lpv = pd.leftPanelValue;
-	  int rpv = pd.rightPanelValue;
-	  int var = pd.variation;
-	  int th = pd.threshold;
-	  // Unlock data reads semaphore
-	  endReadPD();
-
-	  // Check if light esposition is correct LED2 ON if OK else positional LEDS (BLUE or YELLOW) for directions
-	  if (abs(rpv-lpv)<var || (rpv>th && lpv>th))
-		  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
-	  else if (abs(rpv-lpv)>var && rpv>lpv) {
-		  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
-		  HAL_GPIO_WritePin(LED3_WIFI__LED4_BLE_GPIO_Port, LED3_WIFI__LED4_BLE_Pin, GPIO_PIN_SET);
-	  } else if (abs(rpv-lpv)>var && rpv<lpv) {
-		  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
-  		  HAL_GPIO_WritePin(LED3_WIFI__LED4_BLE_GPIO_Port, LED3_WIFI__LED4_BLE_Pin, GPIO_PIN_RESET);
-	  }
-	  // Delay time (msec)
-	  osDelay(1000);
-  }
-  /* USER CODE END StartLedsTask */
 }
 
 /* USER CODE BEGIN Header_StartSynkButton */
@@ -1066,13 +1138,13 @@ void StartSynkButton(void const * argument)
 		  // Reset button pressed variable
 		  blue_button_pressed = 0;
 		  // Start semaphore
-		  startWritePD();
+		  //startWritePD();
 		  // Set threshold
 		  pd.threshold = pd.leftPanelValue<pd.rightPanelValue?pd.leftPanelValue:pd.rightPanelValue;
 		  // Set variation
 		  pd.variation = abs(pd.leftPanelValue - pd.rightPanelValue);
 		  // Release semaphore
-		  endWritePD();
+		  //endWritePD();
 	  }
 	  // Delay time (msec)
 	  osDelay(1000);
@@ -1080,7 +1152,120 @@ void StartSynkButton(void const * argument)
   /* USER CODE END StartSynkButton */
 }
 
+/* USER CODE BEGIN Header_StartReadRightPanel */
 /**
+* @brief Function implementing the ReadRightPanel thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartReadRightPanel */
+void StartReadRightPanel(void const * argument)
+{
+  /* USER CODE BEGIN StartReadRightPanel */
+  /* Infinite loop */
+  for(;;)
+  {
+	ReadRPStart();
+	 // Get right panel value
+	HAL_ADC_Start(&hadc1);
+	HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+	pd.rightPanelValue = HAL_ADC_GetValue(&hadc1)*100/2400;
+
+	ReadRPEnd();
+
+    osDelay(100);
+  }
+  /* USER CODE END StartReadRightPanel */
+}
+
+/* USER CODE BEGIN Header_StartLedTask1 */
+/**
+* @brief Function implementing the ledTask1 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartLedTask1 */
+void StartLedTask1(void const * argument)
+{
+  /* USER CODE BEGIN StartLedTask1 */
+  /* Infinite loop */
+  for(;;)
+  {
+	  WriteL1Start();
+	  int lpv = pd.leftPanelValue;
+	  int rpv = pd.rightPanelValue;
+	  int var = pd.variation;
+	  int th = pd.threshold;
+	  if (abs(rpv-lpv)<var)//(rpv>th && lpv>th))
+	  {
+		  //HAL_GPIO_WritePin(LED3_WIFI__LED4_BLE_GPIO_Port, LED3_WIFI__LED4_BLE_Pin, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
+	  }
+	  WriteL1End();
+	  osDelay(100);
+  }
+  /* USER CODE END StartLedTask1 */
+}
+
+/* USER CODE BEGIN Header_StartLedTask2 */
+/**
+* @brief Function implementing the ledTask2 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartLedTask2 */
+void StartLedTask2(void const * argument)
+{
+  /* USER CODE BEGIN StartLedTask2 */
+  /* Infinite loop */
+  for(;;)
+  {
+	  WriteL2Start();
+	  int lpv = pd.leftPanelValue;
+	  int rpv = pd.rightPanelValue;
+	  int var = pd.variation;
+	  int th = pd.threshold;
+	  if (abs(rpv-lpv)>var && (rpv>=lpv))
+	  {
+		  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
+	  	  HAL_GPIO_WritePin(LED3_WIFI__LED4_BLE_GPIO_Port, LED3_WIFI__LED4_BLE_Pin, GPIO_PIN_SET);
+	  }
+	  WriteL2End();
+	  osDelay(100);
+  }
+  /* USER CODE END StartLedTask2 */
+}
+
+/* USER CODE BEGIN Header_StartLedTask3 */
+/**
+* @brief Function implementing the ledTask3 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartLedTask3 */
+void StartLedTask3(void const * argument)
+{
+  /* USER CODE BEGIN StartLedTask3 */
+  /* Infinite loop */
+  for(;;)
+  {
+	  WriteL3Start();
+	  int lpv = pd.leftPanelValue;
+	  int rpv = pd.rightPanelValue;
+	  int var = pd.variation;
+	  int th = pd.threshold;
+	  if (abs(rpv-lpv)>var && rpv<lpv)
+	  {
+		  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
+		  HAL_GPIO_WritePin(LED3_WIFI__LED4_BLE_GPIO_Port, LED3_WIFI__LED4_BLE_Pin, GPIO_PIN_RESET);
+	  }
+	  WriteL3End();
+	  osDelay(100);
+  }
+  /* USER CODE END StartLedTask3 */
+}
+
+ /**
   * @brief  Period elapsed callback in non blocking mode
   * @note   This function is called  when TIM1 interrupt took place, inside
   * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
@@ -1121,7 +1306,7 @@ void Error_Handler(void)
   * @param  line: assert_param error line source number
   * @retval None
   */
-void assert_failed(char *file, uint32_t line)
+void assert_failed(uint8_t *file, uint32_t line)
 { 
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
