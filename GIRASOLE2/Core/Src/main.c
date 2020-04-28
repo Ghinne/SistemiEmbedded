@@ -73,6 +73,7 @@ osSemaphoreId lpanel_semHandle;
 osSemaphoreId led1_semHandle;
 osSemaphoreId led2_semHandle;
 osSemaphoreId led3_semHandle;
+osSemaphoreId button_semHandle;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -123,6 +124,7 @@ struct prec_control {
 	int l1w, l2w, l3w;
 	int lpanel_done, rpanel_done;
 	int led1_done, led2_done, led3_done;
+	int button_wait, button_can_do;
 } pcm;
 
 void prec_control_manag_init()
@@ -131,6 +133,7 @@ void prec_control_manag_init()
 	pcm.l1w = pcm.l2w = pcm.l3w = 0;
 	pcm.lpanel_done = pcm.rpanel_done = 0;
 	pcm.led1_done = pcm.led2_done = pcm.led3_done = 1;
+	pcm.button_wait = pcm.button_can_do = 0;
 }
 
 // Variable on 1 if button has been pressed
@@ -216,6 +219,10 @@ int main(void)
   /* definition and creation of led3_sem */
   osSemaphoreDef(led3_sem);
   led3_semHandle = osSemaphoreCreate(osSemaphore(led3_sem), 1);
+
+  /* definition and creation of button_sem */
+  osSemaphoreDef(button_sem);
+  button_semHandle = osSemaphoreCreate(osSemaphore(button_sem), 1);
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
   /* add semaphores, ... */
@@ -1027,7 +1034,12 @@ void WriteL1End()
 	if (pcm.led1_done && pcm.led2_done && pcm.led3_done)
 	{
 		pcm.lpanel_done = pcm.rpanel_done = 0; //sblocco i pannelli
-		PostPanelTasks();
+		pcm.button_can_do = 1;
+		if (pcm.button_wait)
+		{
+			pcm.button_wait--;
+			osSemaphoreRelease(button_semHandle);
+		}
 	}
 	osMutexRelease(MutexPDHandle);
 }
@@ -1039,7 +1051,12 @@ void WriteL2End()
 	if (pcm.led1_done && pcm.led2_done && pcm.led3_done)
 	{
 		pcm.lpanel_done = pcm.rpanel_done = 0; //sblocco i pannelli
-		PostPanelTasks();
+		pcm.button_can_do = 1;
+		if (pcm.button_wait)
+		{
+			pcm.button_wait--;
+			osSemaphoreRelease(button_semHandle);
+		}
 	}
 	osMutexRelease(MutexPDHandle);
 }
@@ -1051,11 +1068,35 @@ void WriteL3End()
 	if (pcm.led1_done && pcm.led2_done && pcm.led3_done)
 	{
 		pcm.lpanel_done = pcm.rpanel_done = 0; //sblocco i pannelli
-		PostPanelTasks();
+		pcm.button_can_do = 1;
+		if (pcm.button_wait)
+		{
+			pcm.button_wait--;
+			osSemaphoreRelease(button_semHandle);
+		}
 	}
 	osMutexRelease(MutexPDHandle);
 }
 
+void StartReadButton()
+{
+	osMutexWait(MutexPDHandle, osWaitForever);
+	if (pcm.button_can_do)
+		osSemaphoreRelease(button_semHandle);
+	else
+		pcm.button_wait++;
+	osMutexRelease(MutexPDHandle);
+	osSemaphoreWait(button_semHandle, osWaitForever);
+}
+
+void EndReadButton()
+{
+	osMutexWait(MutexPDHandle, osWaitForever);
+	pcm.button_can_do = 0; //non può andare
+	pcm.button_wait = 0; //non è più in attesa
+	PostPanelTasks();
+	osMutexRelease(MutexPDHandle);
+}
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartReadLeftPanel */
@@ -1134,6 +1175,7 @@ void StartSynkButton(void const * argument)
   /* Infinite loop */
   for(;;)
   {
+	  StartReadButton();
 	  if (blue_button_pressed) {
 		  // Reset button pressed variable
 		  blue_button_pressed = 0;
@@ -1146,6 +1188,7 @@ void StartSynkButton(void const * argument)
 		  // Release semaphore
 		  //endWritePD();
 	  }
+	  EndReadButton();
 	  // Delay time (msec)
 	  osDelay(1000);
   }
