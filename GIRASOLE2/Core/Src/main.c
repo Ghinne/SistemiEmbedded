@@ -965,8 +965,14 @@ void ReadLPEnd()
 	pcm.lpanel_done = 1;
 	if (pcm.lpanel_done && pcm.rpanel_done)
     {
-		pcm.led1_done = pcm.led2_done = pcm.led3_done = 0; //indico che devono eseguire i led
-	    PostLedTasks();
+		//pcm.led1_done = pcm.led2_done = pcm.led3_done = 0; //indico che devono eseguire i led
+	    //PostLedTasks();
+		pcm.button_can_do = 1;
+		if (pcm.button_wait)
+		{
+			pcm.button_wait--;
+			osSemaphoreRelease(button_semHandle);
+		}
 	 }
 	osMutexRelease(MutexPDHandle);
 }
@@ -988,8 +994,14 @@ void ReadRPEnd()
 	pcm.rpanel_done = 1;
 	if (pcm.lpanel_done && pcm.rpanel_done)
 	{
-		pcm.led1_done = pcm.led2_done = pcm.led3_done = 0; //indico che devono eseguire i led
-		PostLedTasks();
+		//pcm.led1_done = pcm.led2_done = pcm.led3_done = 0; //indico che devono eseguire i led
+		//PostLedTasks();
+		pcm.button_can_do = 1;
+		if (pcm.button_wait)
+		{
+			pcm.button_wait--;
+			osSemaphoreRelease(button_semHandle);
+		}
 	}
 	osMutexRelease(MutexPDHandle);
 }
@@ -1034,12 +1046,7 @@ void WriteL1End()
 	if (pcm.led1_done && pcm.led2_done && pcm.led3_done)
 	{
 		pcm.lpanel_done = pcm.rpanel_done = 0; //sblocco i pannelli
-		pcm.button_can_do = 1;
-		if (pcm.button_wait)
-		{
-			pcm.button_wait--;
-			osSemaphoreRelease(button_semHandle);
-		}
+		PostPanelTasks();
 	}
 	osMutexRelease(MutexPDHandle);
 }
@@ -1051,12 +1058,7 @@ void WriteL2End()
 	if (pcm.led1_done && pcm.led2_done && pcm.led3_done)
 	{
 		pcm.lpanel_done = pcm.rpanel_done = 0; //sblocco i pannelli
-		pcm.button_can_do = 1;
-		if (pcm.button_wait)
-		{
-			pcm.button_wait--;
-			osSemaphoreRelease(button_semHandle);
-		}
+		PostPanelTasks();
 	}
 	osMutexRelease(MutexPDHandle);
 }
@@ -1068,12 +1070,7 @@ void WriteL3End()
 	if (pcm.led1_done && pcm.led2_done && pcm.led3_done)
 	{
 		pcm.lpanel_done = pcm.rpanel_done = 0; //sblocco i pannelli
-		pcm.button_can_do = 1;
-		if (pcm.button_wait)
-		{
-			pcm.button_wait--;
-			osSemaphoreRelease(button_semHandle);
-		}
+		PostPanelTasks();
 	}
 	osMutexRelease(MutexPDHandle);
 }
@@ -1094,7 +1091,9 @@ void EndReadButton()
 	osMutexWait(MutexPDHandle, osWaitForever);
 	pcm.button_can_do = 0; //non può andare
 	pcm.button_wait = 0; //non è più in attesa
-	PostPanelTasks();
+	//PostPanelTasks();
+	pcm.led1_done = pcm.led2_done = pcm.led3_done = 0; //indico che devono eseguire i led
+	PostLedTasks();
 	osMutexRelease(MutexPDHandle);
 }
 /* USER CODE END 4 */
@@ -1190,7 +1189,7 @@ void StartSynkButton(void const * argument)
 	  }
 	  EndReadButton();
 	  // Delay time (msec)
-	  osDelay(1000);
+	  osDelay(100);
   }
   /* USER CODE END StartSynkButton */
 }
