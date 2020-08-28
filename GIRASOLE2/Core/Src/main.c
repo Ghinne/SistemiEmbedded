@@ -38,7 +38,8 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+#define BLUETOOTH
+#define SERIAL
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -53,6 +54,7 @@ QSPI_HandleTypeDef hqspi;
 
 SPI_HandleTypeDef hspi3;
 
+UART_HandleTypeDef huart4;
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart3;
 
@@ -81,6 +83,7 @@ static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_ADC2_Init(void);
+static void MX_UART4_Init(void);
 void StartReadPanels(void const * argument);
 void StartSerialDebug(void const * argument);
 void StartLedsTask(void const * argument);
@@ -118,7 +121,6 @@ void controlRWPDInit() {
 
 // Variable on 1 if button has been pressed
 extern int blue_button_pressed;
-
 /* USER CODE END 0 */
 
 /**
@@ -162,8 +164,10 @@ int main(void)
   MX_USB_OTG_FS_PCD_Init();
   MX_ADC1_Init();
   MX_ADC2_Init();
+  MX_UART4_Init();
   /* USER CODE BEGIN 2 */
-
+  __HAL_UART_ENABLE_IT(&huart4, UART_IT_RXNE);
+  __HAL_UART_ENABLE_IT(&huart4, UART_IT_TC);
   /* USER CODE END 2 */
 
   /* Create the mutex(es) */
@@ -279,10 +283,12 @@ void SystemClock_Config(void)
     Error_Handler();
   }
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_USART3
-                              |RCC_PERIPHCLK_I2C2|RCC_PERIPHCLK_DFSDM1
-                              |RCC_PERIPHCLK_USB|RCC_PERIPHCLK_ADC;
+                              |RCC_PERIPHCLK_UART4|RCC_PERIPHCLK_I2C2
+                              |RCC_PERIPHCLK_DFSDM1|RCC_PERIPHCLK_USB
+                              |RCC_PERIPHCLK_ADC;
   PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK2;
   PeriphClkInit.Usart3ClockSelection = RCC_USART3CLKSOURCE_PCLK1;
+  PeriphClkInit.Uart4ClockSelection = RCC_UART4CLKSOURCE_PCLK1;
   PeriphClkInit.I2c2ClockSelection = RCC_I2C2CLKSOURCE_PCLK1;
   PeriphClkInit.AdcClockSelection = RCC_ADCCLKSOURCE_PLLSAI1;
   PeriphClkInit.Dfsdm1ClockSelection = RCC_DFSDM1CLKSOURCE_PCLK;
@@ -587,6 +593,41 @@ static void MX_SPI3_Init(void)
 }
 
 /**
+  * @brief UART4 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_UART4_Init(void)
+{
+
+  /* USER CODE BEGIN UART4_Init 0 */
+
+  /* USER CODE END UART4_Init 0 */
+
+  /* USER CODE BEGIN UART4_Init 1 */
+
+  /* USER CODE END UART4_Init 1 */
+  huart4.Instance = UART4;
+  huart4.Init.BaudRate = 9600;
+  huart4.Init.WordLength = UART_WORDLENGTH_8B;
+  huart4.Init.StopBits = UART_STOPBITS_1;
+  huart4.Init.Parity = UART_PARITY_NONE;
+  huart4.Init.Mode = UART_MODE_TX_RX;
+  huart4.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart4.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart4.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart4.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN UART4_Init 2 */
+
+  /* USER CODE END UART4_Init 2 */
+
+}
+
+/**
   * @brief USART1 Initialization Function
   * @param None
   * @retval None
@@ -751,14 +792,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(BUTBLUE_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : ARD_D1_Pin ARD_D0_Pin */
-  GPIO_InitStruct.Pin = ARD_D1_Pin|ARD_D0_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  GPIO_InitStruct.Alternate = GPIO_AF8_UART4;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
   /*Configure GPIO pins : ARD_D10_Pin SPBTLE_RF_RST_Pin ARD_D9_Pin */
   GPIO_InitStruct.Pin = ARD_D10_Pin|SPBTLE_RF_RST_Pin|ARD_D9_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -853,7 +886,7 @@ static void MX_GPIO_Init(void)
   HAL_NVIC_SetPriority(EXTI9_5_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
-  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 3, 0);
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
@@ -989,21 +1022,33 @@ void StartSerialDebug(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-	char msg[50];
+	#ifdef SERIAL
+	  char msg[50];
 
-	/** Update panel data structure values **/
-	// Lock data reads semaphore
-  	startReadPD();
+	  /** Update panel data structure values **/
+	  // Lock data reads semaphore
+	  startReadPD();
+	  // Get data
+	  sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %hu\r\nVar = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
+	  // Unlock data reads semaphore
+	  endReadPD();
 
-  	// Get data
-	sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %hu\r\nVar = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
+	  // Print data
+	  HAL_UART_Transmit(&huart1, (uint8_t *) msg, strlen(msg), HAL_MAX_DELAY);
+	#endif
 
-	// Unlock data reads semaphore
-	endReadPD();
+	#ifdef BLUETOOTH
+      /** Update panel data structure values **/
+      // Lock data reads semaphore
+      startReadPD();
+      // Get data
+      sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %hu\r\nVar = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
+      // Unlock data reads semaphore
+      endReadPD();
 
-	// Print data
-	HAL_UART_Transmit(&huart1, (uint8_t *) msg, strlen(msg), HAL_MAX_DELAY);
-
+      // Print data
+      HAL_UART_Transmit(&huart4, (uint8_t *) msg, strlen(msg), HAL_MAX_DELAY);
+	#endif
 	// Delay time (msec)
 	osDelay(3000);
   }

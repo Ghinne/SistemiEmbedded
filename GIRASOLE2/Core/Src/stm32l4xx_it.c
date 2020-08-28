@@ -58,6 +58,8 @@ int blue_button_pressed = 0;
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
+extern UART_HandleTypeDef huart4;
+extern UART_HandleTypeDef huart1;
 extern TIM_HandleTypeDef htim1;
 
 /* USER CODE BEGIN EV */
@@ -209,6 +211,27 @@ void EXTI15_10_IRQHandler(void)
   /* USER CODE BEGIN EXTI15_10_IRQn 1 */
 
   /* USER CODE END EXTI15_10_IRQn 1 */
+}
+
+/**
+  * @brief This function handles UART4 global interrupt.
+  */
+void UART4_IRQHandler(void)
+{
+  uint8_t Rx_Data[1];
+  /* USER CODE BEGIN UART4_IRQn 0 */
+  /* USER CODE END UART4_IRQn 0 */
+  HAL_UART_IRQHandler(&huart4);
+  /* USER CODE BEGIN UART4_IRQn 1 */
+  HAL_UART_Receive_IT(&huart4, Rx_Data, 1);
+
+  if (Rx_Data[0] == 'R') {
+	  blue_button_pressed = 1;
+	  char* msg = "Soglia modificata!\n";
+	  HAL_UART_Transmit_IT(&huart4, (uint8_t *) msg, strlen(msg));
+	  Rx_Data[0] = '\0';
+  }
+  /* USER CODE END UART4_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */
