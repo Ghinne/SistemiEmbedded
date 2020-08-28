@@ -59,11 +59,9 @@ int blue_button_pressed = 0;
 
 /* External variables --------------------------------------------------------*/
 extern UART_HandleTypeDef huart4;
-extern UART_HandleTypeDef huart1;
 extern TIM_HandleTypeDef htim1;
-
 /* USER CODE BEGIN EV */
-
+extern uint8_t* Rx_Data[1];
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -171,7 +169,6 @@ void EXTI9_5_IRQHandler(void)
 
   /* USER CODE END EXTI9_5_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_5);
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_6);
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_7);
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_8);
   /* USER CODE BEGIN EXTI9_5_IRQn 1 */
@@ -206,7 +203,6 @@ void EXTI15_10_IRQHandler(void)
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_14);
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_15);
   /* USER CODE BEGIN EXTI15_10_IRQn 1 */
 
@@ -218,7 +214,6 @@ void EXTI15_10_IRQHandler(void)
   */
 void UART4_IRQHandler(void)
 {
-  uint8_t Rx_Data[1];
   /* USER CODE BEGIN UART4_IRQn 0 */
   /* USER CODE END UART4_IRQn 0 */
   HAL_UART_IRQHandler(&huart4);
