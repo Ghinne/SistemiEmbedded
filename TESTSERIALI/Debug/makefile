@@ -51,13 +51,16 @@ default.size.stdout \
 OBJDUMP_LIST += \
 TESTSERIALI.list \
 
+OBJCOPY_BIN += \
+TESTSERIALI.bin \
+
 
 # All Target
 all: TESTSERIALI.elf secondary-outputs
 
 # Tool invocations
-TESTSERIALI.elf: $(OBJS) $(USER_OBJS) C:\Users\ghine\W.I.P\PROGETTIST32\TESTSERIALI\STM32L475VGTX_FLASH.ld
-	arm-none-eabi-g++ -o "TESTSERIALI.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\ghine\W.I.P\PROGETTIST32\TESTSERIALI\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TESTSERIALI.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+TESTSERIALI.elf: $(OBJS) $(USER_OBJS) C:\Users\gabriele\Desktop\develop\SistemiEmbedded\TESTSERIALI\STM32L475VGTX_FLASH.ld
+	arm-none-eabi-g++ -o "TESTSERIALI.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\gabriele\Desktop\develop\SistemiEmbedded\TESTSERIALI\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TESTSERIALI.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -71,12 +74,17 @@ TESTSERIALI.list: $(EXECUTABLES)
 	@echo 'Finished building: $@'
 	@echo ' '
 
+TESTSERIALI.bin: $(EXECUTABLES)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "TESTSERIALI.bin"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
 	-$(RM) *
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_BIN)
 
 .PHONY: all clean dependents
 .SECONDARY:

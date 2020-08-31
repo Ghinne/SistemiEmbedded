@@ -51,13 +51,16 @@ default.size.stdout \
 OBJDUMP_LIST += \
 TESTANALOGICO.list \
 
+OBJCOPY_BIN += \
+TESTANALOGICO.bin \
+
 
 # All Target
 all: TESTANALOGICO.elf secondary-outputs
 
 # Tool invocations
-TESTANALOGICO.elf: $(OBJS) $(USER_OBJS) C:\Users\ghine\W.I.P\PROGETTIST32\TESTANALOGICO\STM32L475VGTX_FLASH.ld
-	arm-none-eabi-g++ -o "TESTANALOGICO.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\ghine\W.I.P\PROGETTIST32\TESTANALOGICO\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TESTANALOGICO.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+TESTANALOGICO.elf: $(OBJS) $(USER_OBJS) C:\Users\gabriele\Desktop\develop\SistemiEmbedded\TESTANALOGICO\STM32L475VGTX_FLASH.ld
+	arm-none-eabi-g++ -o "TESTANALOGICO.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\gabriele\Desktop\develop\SistemiEmbedded\TESTANALOGICO\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TESTANALOGICO.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -71,12 +74,17 @@ TESTANALOGICO.list: $(EXECUTABLES)
 	@echo 'Finished building: $@'
 	@echo ' '
 
+TESTANALOGICO.bin: $(EXECUTABLES)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "TESTANALOGICO.bin"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
 	-$(RM) *
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_BIN)
 
 .PHONY: all clean dependents
 .SECONDARY:

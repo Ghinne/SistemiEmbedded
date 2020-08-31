@@ -39,11 +39,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
  17 .debug_line   0001a32d  00000000  00000000  0007ba4b  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .debug_str    001176e0  00000000  00000000  00095d78  2**0
+ 18 .debug_str    00117726  00000000  00000000  00095d78  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .comment      0000007b  00000000  00000000  001ad458  2**0
+ 19 .comment      0000007b  00000000  00000000  001ad49e  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00009a08  00000000  00000000  001ad4d4  2**2
+ 20 .debug_frame  00009a08  00000000  00000000  001ad51c  2**2
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -3219,35 +3219,20 @@ void EXTI15_10_IRQHandler(void)
  800153a:	bd80      	pop	{r7, pc}
 
 0800153c <_sbrk>:
-/**
- _sbrk
- Increase program data space. Malloc and related functions depend on this
-**/
-caddr_t _sbrk(int incr)
-{
  800153c:	b580      	push	{r7, lr}
  800153e:	b084      	sub	sp, #16
  8001540:	af00      	add	r7, sp, #0
  8001542:	6078      	str	r0, [r7, #4]
-	extern char end asm("end");
-	static char *heap_end;
-	char *prev_heap_end;
-
-	if (heap_end == 0)
  8001544:	4b11      	ldr	r3, [pc, #68]	; (800158c <_sbrk+0x50>)
  8001546:	681b      	ldr	r3, [r3, #0]
  8001548:	2b00      	cmp	r3, #0
  800154a:	d102      	bne.n	8001552 <_sbrk+0x16>
-		heap_end = &end;
  800154c:	4b0f      	ldr	r3, [pc, #60]	; (800158c <_sbrk+0x50>)
  800154e:	4a10      	ldr	r2, [pc, #64]	; (8001590 <_sbrk+0x54>)
  8001550:	601a      	str	r2, [r3, #0]
-
-	prev_heap_end = heap_end;
  8001552:	4b0e      	ldr	r3, [pc, #56]	; (800158c <_sbrk+0x50>)
  8001554:	681b      	ldr	r3, [r3, #0]
  8001556:	60fb      	str	r3, [r7, #12]
-	if (heap_end + incr > stack_ptr)
  8001558:	4b0c      	ldr	r3, [pc, #48]	; (800158c <_sbrk+0x50>)
  800155a:	681a      	ldr	r2, [r3, #0]
  800155c:	687b      	ldr	r3, [r7, #4]
@@ -3255,28 +3240,19 @@ caddr_t _sbrk(int incr)
  8001560:	466a      	mov	r2, sp
  8001562:	4293      	cmp	r3, r2
  8001564:	d907      	bls.n	8001576 <_sbrk+0x3a>
-	{
-		errno = ENOMEM;
  8001566:	f006 f93b 	bl	80077e0 <__errno>
  800156a:	4602      	mov	r2, r0
  800156c:	230c      	movs	r3, #12
  800156e:	6013      	str	r3, [r2, #0]
-		return (caddr_t) -1;
  8001570:	f04f 33ff 	mov.w	r3, #4294967295
  8001574:	e006      	b.n	8001584 <_sbrk+0x48>
-	}
-
-	heap_end += incr;
  8001576:	4b05      	ldr	r3, [pc, #20]	; (800158c <_sbrk+0x50>)
  8001578:	681a      	ldr	r2, [r3, #0]
  800157a:	687b      	ldr	r3, [r7, #4]
  800157c:	4413      	add	r3, r2
  800157e:	4a03      	ldr	r2, [pc, #12]	; (800158c <_sbrk+0x50>)
  8001580:	6013      	str	r3, [r2, #0]
-
-	return (caddr_t) prev_heap_end;
  8001582:	68fb      	ldr	r3, [r7, #12]
-}
  8001584:	4618      	mov	r0, r3
  8001586:	3710      	adds	r7, #16
  8001588:	46bd      	mov	sp, r7
@@ -3366,103 +3342,47 @@ void SystemInit(void)
  80015fc:	40021000 	.word	0x40021000
 
 08001600 <Reset_Handler>:
-
-    .section	.text.Reset_Handler
-	.weak	Reset_Handler
-	.type	Reset_Handler, %function
-Reset_Handler:
-  ldr   sp, =_estack    /* Atollic update: set stack pointer */
  8001600:	f8df d034 	ldr.w	sp, [pc, #52]	; 8001638 <LoopForever+0x2>
-
-/* Copy the data segment initializers from flash to SRAM */
-  movs	r1, #0
  8001604:	2100      	movs	r1, #0
-  b	LoopCopyDataInit
  8001606:	e003      	b.n	8001610 <LoopCopyDataInit>
 
 08001608 <CopyDataInit>:
-
-CopyDataInit:
-	ldr	r3, =_sidata
  8001608:	4b0c      	ldr	r3, [pc, #48]	; (800163c <LoopForever+0x6>)
-	ldr	r3, [r3, r1]
  800160a:	585b      	ldr	r3, [r3, r1]
-	str	r3, [r0, r1]
  800160c:	5043      	str	r3, [r0, r1]
-	adds	r1, r1, #4
  800160e:	3104      	adds	r1, #4
 
 08001610 <LoopCopyDataInit>:
-
-LoopCopyDataInit:
-	ldr	r0, =_sdata
  8001610:	480b      	ldr	r0, [pc, #44]	; (8001640 <LoopForever+0xa>)
-	ldr	r3, =_edata
  8001612:	4b0c      	ldr	r3, [pc, #48]	; (8001644 <LoopForever+0xe>)
-	adds	r2, r0, r1
  8001614:	1842      	adds	r2, r0, r1
-	cmp	r2, r3
  8001616:	429a      	cmp	r2, r3
-	bcc	CopyDataInit
  8001618:	d3f6      	bcc.n	8001608 <CopyDataInit>
-	ldr	r2, =_sbss
  800161a:	4a0b      	ldr	r2, [pc, #44]	; (8001648 <LoopForever+0x12>)
-	b	LoopFillZerobss
  800161c:	e002      	b.n	8001624 <LoopFillZerobss>
 
 0800161e <FillZerobss>:
-/* Zero fill the bss segment. */
-FillZerobss:
-	movs	r3, #0
  800161e:	2300      	movs	r3, #0
-	str	r3, [r2], #4
  8001620:	f842 3b04 	str.w	r3, [r2], #4
 
 08001624 <LoopFillZerobss>:
-
-LoopFillZerobss:
-	ldr	r3, = _ebss
  8001624:	4b09      	ldr	r3, [pc, #36]	; (800164c <LoopForever+0x16>)
-	cmp	r2, r3
  8001626:	429a      	cmp	r2, r3
-	bcc	FillZerobss
  8001628:	d3f9      	bcc.n	800161e <FillZerobss>
-
-/* Call the clock system intitialization function.*/
-    bl  SystemInit
  800162a:	f7ff ffb3 	bl	8001594 <SystemInit>
-/* Call static constructors */
-    bl __libc_init_array
  800162e:	f006 f8dd 	bl	80077ec <__libc_init_array>
-/* Call the application's entry point.*/
-	bl	main
  8001632:	f7fe ffbf 	bl	80005b4 <main>
 
 08001636 <LoopForever>:
-
-LoopForever:
-    b LoopForever
  8001636:	e7fe      	b.n	8001636 <LoopForever>
-  ldr   sp, =_estack    /* Atollic update: set stack pointer */
  8001638:	20018000 	.word	0x20018000
-	ldr	r3, =_sidata
  800163c:	08008144 	.word	0x08008144
-	ldr	r0, =_sdata
  8001640:	20000000 	.word	0x20000000
-	ldr	r3, =_edata
  8001644:	20000074 	.word	0x20000074
-	ldr	r2, =_sbss
  8001648:	20000074 	.word	0x20000074
-	ldr	r3, = _ebss
  800164c:	20001700 	.word	0x20001700
 
 08001650 <ADC1_2_IRQHandler>:
- * @retval : None
-*/
-    .section	.text.Default_Handler,"ax",%progbits
-Default_Handler:
-Infinite_Loop:
-	b	Infinite_Loop
  8001650:	e7fe      	b.n	8001650 <ADC1_2_IRQHandler>
 
 08001652 <HAL_Init>:
