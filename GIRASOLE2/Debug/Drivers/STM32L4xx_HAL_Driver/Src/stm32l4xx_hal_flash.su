@@ -8,7 +8,7 @@ stm32l4xx_hal_flash.c:531:19:HAL_FLASH_Lock	4	static
 stm32l4xx_hal_flash.c:543:19:HAL_FLASH_OB_Unlock	4	static
 stm32l4xx_hal_flash.c:563:19:HAL_FLASH_OB_Lock	4	static
 stm32l4xx_hal_flash.c:575:19:HAL_FLASH_OB_Launch	8	static
-stm32l4xx_hal_flash.c:624:10:HAL_FLASH_GetError	4	static
-stm32l4xx_hal_flash.c:648:19:FLASH_WaitForLastOperation	24	static
-stm32l4xx_hal_flash.c:698:13:FLASH_Program_DoubleWord	24	static,ignoring_inline_asm
-stm32l4xx_hal_flash.c:723:13:FLASH_Program_Fast	40	static,ignoring_inline_asm
+stm32l4xx_hal_flash.c:625:10:HAL_FLASH_GetError	4	static
+stm32l4xx_hal_flash.c:649:19:FLASH_WaitForLastOperation	24	static
+stm32l4xx_hal_flash.c:700:13:FLASH_Program_DoubleWord	24	static,ignoring_inline_asm
+stm32l4xx_hal_flash.c:725:13:FLASH_Program_Fast	40	static,ignoring_inline_asm

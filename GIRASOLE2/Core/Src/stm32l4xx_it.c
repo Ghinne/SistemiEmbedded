@@ -60,12 +60,13 @@ int blue_button_pressed = 0;
 /* External variables --------------------------------------------------------*/
 extern UART_HandleTypeDef huart4;
 extern TIM_HandleTypeDef htim1;
+
 /* USER CODE BEGIN EV */
 extern uint8_t* Rx_Data[1];
 /* USER CODE END EV */
 
 /******************************************************************************/
-/*           Cortex-M4 Processor Interruption and Exception Handlers          */ 
+/*           Cortex-M4 Processor Interruption and Exception Handlers          */
 /******************************************************************************/
 /**
   * @brief This function handles Non maskable interrupt.

@@ -31,6 +31,12 @@ endif
 ifneq ($(strip $(CXX_DEPS)),)
 -include $(CXX_DEPS)
 endif
+ifneq ($(strip $(S_DEPS)),)
+-include $(S_DEPS)
+endif
+ifneq ($(strip $(S_UPPER_DEPS)),)
+-include $(S_UPPER_DEPS)
+endif
 ifneq ($(strip $(C_DEPS)),)
 -include $(C_DEPS)
 endif
@@ -59,8 +65,8 @@ GIRASOLE2.bin \
 all: GIRASOLE2.elf secondary-outputs
 
 # Tool invocations
-GIRASOLE2.elf: $(OBJS) $(USER_OBJS) C:\Users\gabriele\Desktop\develop\SistemiEmbedded\GIRASOLE2\STM32L475VGTX_FLASH.ld
-	arm-none-eabi-g++ -o "GIRASOLE2.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\gabriele\Desktop\develop\SistemiEmbedded\GIRASOLE2\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="GIRASOLE2.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+GIRASOLE2.elf: $(OBJS) $(USER_OBJS) C:\Users\ghine\W.I.P\PROGETTIST32\SistemiEmbedded\GIRASOLE2\STM32L475VGTX_FLASH.ld
+	arm-none-eabi-g++ -o "GIRASOLE2.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\ghine\W.I.P\PROGETTIST32\SistemiEmbedded\GIRASOLE2\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="GIRASOLE2.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

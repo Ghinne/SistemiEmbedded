@@ -27,6 +27,6 @@ stm32l4xx_hal_cortex.c:371:10:HAL_NVIC_GetActive	16	static
 stm32l4xx_hal_cortex.c:385:6:HAL_SYSTICK_CLKSourceConfig	16	static
 stm32l4xx_hal_cortex.c:403:6:HAL_SYSTICK_IRQHandler	8	static
 stm32l4xx_hal_cortex.c:412:13:HAL_SYSTICK_Callback	4	static
-stm32l4xx_hal_cortex.c:431:6:HAL_MPU_Enable	16	static,ignoring_inline_asm
-stm32l4xx_hal_cortex.c:446:6:HAL_MPU_Disable	4	static,ignoring_inline_asm
-stm32l4xx_hal_cortex.c:462:6:HAL_MPU_ConfigRegion	16	static
+stm32l4xx_hal_cortex.c:424:6:HAL_MPU_Disable	4	static,ignoring_inline_asm
+stm32l4xx_hal_cortex.c:447:6:HAL_MPU_Enable	16	static,ignoring_inline_asm
+stm32l4xx_hal_cortex.c:466:6:HAL_MPU_ConfigRegion	16	static
