@@ -964,9 +964,7 @@ void ReadLPEnd()
 	osMutexWait(MutexPDHandle, osWaitForever);
 	pcm.lpanel_done = 1;
 	if (pcm.lpanel_done && pcm.rpanel_done)
-    {
-		//pcm.led1_done = pcm.led2_done = pcm.led3_done = 0; //indico che devono eseguire i led
-	    //PostLedTasks();
+	{
 		pcm.button_can_do = 1;
 		if (pcm.button_wait)
 		{
@@ -994,8 +992,6 @@ void ReadRPEnd()
 	pcm.rpanel_done = 1;
 	if (pcm.lpanel_done && pcm.rpanel_done)
 	{
-		//pcm.led1_done = pcm.led2_done = pcm.led3_done = 0; //indico che devono eseguire i led
-		//PostLedTasks();
 		pcm.button_can_do = 1;
 		if (pcm.button_wait)
 		{
@@ -1091,7 +1087,6 @@ void EndReadButton()
 	osMutexWait(MutexPDHandle, osWaitForever);
 	pcm.button_can_do = 0; //non può andare
 	pcm.button_wait = 0; //non è più in attesa
-	//PostPanelTasks();
 	pcm.led1_done = pcm.led2_done = pcm.led3_done = 0; //indico che devono eseguire i led
 	PostLedTasks();
 	osMutexRelease(MutexPDHandle);
