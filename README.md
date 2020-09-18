@@ -82,6 +82,29 @@
             <li>Accensione led verde
               <ul>
                 <p>L'accensione di questo led dichiara che i pannelli si trovano in una posizione di illuminazione ottimale, relativamente alle soglie attuali.<br>
-                   Perchè si accenda il valore dei pannelli deve essere
-                </p>
+                   Perchè si accenda il led bisogna che:<br>
+                   <b>|Pannello DX - Pannello SX| < Variazione AND Pannello DX > Soglia minima AND Pannello SX > Soglia minima</b>
+                 </p>
               </ul>
+            <li>Accensione led blu
+              <ul>
+                <p>L'accensione di questo led dichiara che i pannelli non si trovano in una posizione di illuminazione ottimale è quindi necessario ruotarli in senso orario.
+                   <br>
+                   Perchè si accenda il led e si spenga il verde bisogna che:<br>
+                   <b>|Pannello DX - Pannello SX| > Variazione AND Pannello DX >= Pannello SX</b>
+                 </p>
+              </ul>
+            <li>Accensione led giallo
+              <ul>
+                <p>L'accensione di questo led dichiara che i pannelli non si trovano in una posizione di illuminazione ottimale è quindi necessario ruotarli in senso antiorario.
+                   <br>
+                   Perchè si accenda il led e si spenga il verde bisogna che:<br>
+                   <b>|Pannello DX - Pannello SX| > Variazione AND Pannello DX < Pannello SX</b>
+                 </p>
+              </ul>
+           </ul>
+        <p>I thread una volta creati restano attivi operando nel rispetto dell'ordine seguente definito dai semafori.</p>
+        <p><img alt="Image" title="icon" src="G_IMG.png" width="600" height="600" align="center"/></p>
+    </p>
+  </ul>
+   
