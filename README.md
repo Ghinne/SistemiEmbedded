@@ -34,8 +34,10 @@
 <h3>Comunicazione seriale</h3>
   <ul>
     <p>Utilizzata per leggere i valori percentuali dei pannelli, le soglie attuali e per aggiornare i valori di soglia</p>
-    <li>USB</li>
-    <li>Bluetooth</li>
+    <li>USB (UART4)</li>
+    <li>Bluetooth (UART3)<br>
+      <dd>Non riuscendo a utilizzare il modulo bluetooth integrato, per mancanza di documentazione, ci siamo affidati a una board esterna HM-10
+    </li>
   </ul>
 <h3>Funzionamento</h3>
   
