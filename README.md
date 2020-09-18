@@ -40,4 +40,48 @@
     </li>
   </ul>
 <h3>Funzionamento</h3>
-  
+  <ul>
+    <p>Il sistema una volta alimentato crea:
+      <ul>
+        <li>La struttura dati per le letture dei diversi pannelli;</li>
+        <li>Gli interrupt handler che si occupano di gestire gli interrupt relativi all'aggiornamento delle soglie (pulsante blu, carattere 'R' via bluetooth);
+        <li>I mutex:
+          <ul>
+            <li>MUTEX 1 GABRY </li>
+            <li>MUTEX 2 GABRY </li>
+          </ul>
+        <li>I thread:
+          <ul>
+            <li>Lettura pannello destro
+              <ul>
+                <p>Questo thread legge il valore analogico in output dal pannello destro (0.0 - 5.0) lo converte in una percentuale, per poi aggiornare in mutuale esclusione 
+                   il relativo valore contenuto all'interno della struttura dati.
+                </p>
+              </ul>
+            <li>Lettura pannello sinistro
+              <ul>
+                <p>Questo thread legge il valore analogico in output dal pannello sinistro (0.0 - 5.0) lo converte in una percentuale, per poi aggiornare in mutuale esclusione 
+                   il relativo valore contenuto all'interno della struttura dati.
+                </p>
+              </ul>              
+            <li>Stampe seriali
+              <ul>
+                <p>Questo thread in base alle macro settate stampa i valori relativi ai pannelli e alle soglie attuali su seriale (USB e/o Bluetooth).
+                </p>
+              </ul>
+            <li>Gestione eventi di interrupt
+              <ul>
+                <p>Questo thread controlla il valore del flag di avvenuto interrupt (quelli precedentemente descritti), aggiorna i valori relativi alle soglie e lo resetta.<br>
+                   Le soglie finora descritte riguardano:
+                   <ul>
+                     <p>Soglia minima, attuale valore più basso tra quelli registrati.</p>
+                     <p>Variazione, differenza tra i valori attuali dei pannelli.</p>
+                   </ul>
+                </p>
+              </ul>
+            <li>Accensione led verde
+              <ul>
+                <p>L'accensione di questo led dichiara che i pannelli si trovano in una posizione di illuminazione ottimale, relativamente alle soglie attuali.<br>
+                   Perchè si accenda il valore dei pannelli deve essere
+                </p>
+              </ul>
