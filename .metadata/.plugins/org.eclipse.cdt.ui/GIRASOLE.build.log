@@ -1,10 +1,68 @@
-15:20:06 **** Incremental Build of configuration Debug for project GIRASOLE ****
+15:54:34 **** Incremental Build of configuration Debug for project GIRASOLE ****
 make -j12 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DDEBUG -DSTM32L475xx -c -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Core/Inc -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'StartSerialDebug':
+../Core/Src/main.c:1133:2: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
+  sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %hu\r\nVar = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
+  ^~~~~~~
+../Core/Src/main.c:1133:2: warning: incompatible implicit declaration of built-in function 'sprintf'
+../Core/Src/main.c:1133:2: note: include '<stdio.h>' or provide a declaration of 'sprintf'
+../Core/Src/main.c:1139:46: warning: implicit declaration of function 'strlen' [-Wimplicit-function-declaration]
+  HAL_UART_Transmit(&huart1, (uint8_t *) msg, strlen(msg), HAL_MAX_DELAY);
+                                              ^~~~~~
+../Core/Src/main.c:1139:46: warning: incompatible implicit declaration of built-in function 'strlen'
+../Core/Src/main.c:1139:46: note: include '<string.h>' or provide a declaration of 'strlen'
+../Core/Src/main.c: In function 'StartSyncButton':
+../Core/Src/main.c:1183:20: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+     pd.variation = abs(pd.leftPanelValue - pd.rightPanelValue);
+                    ^~~
+../Core/Src/main.c: In function 'StartLedTask2':
+../Core/Src/main.c:1237:8: warning: unused variable 'th' [-Wunused-variable]
+    int th = pd.threshold;
+        ^~
+../Core/Src/main.c: In function 'StartLedTask3':
+../Core/Src/main.c:1266:8: warning: unused variable 'th' [-Wunused-variable]
+    int th = pd.threshold;
+        ^~
+../Core/Src/main.c: In function 'StartSerialDebug':
+../Core/Src/main.c:1133:74: warning: '
+
+Thr = ' directive writing 8 bytes into a region of size between 0 and 7 [-Wformat-overflow=]
+  sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %hu\r\nVar = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
+                                                                 ~~~~~~~~~^
+../Core/Src/main.c:1133:15: note: using the range [0, 65535] for directive argument
+  sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %hu\r\nVar = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
+               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1133:15: note: using the range [0, 65535] for directive argument
+../Core/Src/main.c:1133:2: note: 'sprintf' output between 64 and 80 bytes into a destination of size 50
+  sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %hu\r\nVar = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
+  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1147:77: warning: '
+
+Thr = ' directive writing 8 bytes into a region of size between 0 and 7 [-Wformat-overflow=]
+     sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %hu\r\nVar = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
+                                                                    ~~~~~~~~~^
+../Core/Src/main.c:1147:18: note: using the range [0, 65535] for directive argument
+     sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %hu\r\nVar = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
+                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/main.c:1147:18: note: using the range [0, 65535] for directive argument
+../Core/Src/main.c:1147:5: note: 'sprintf' output between 64 and 80 bytes into a destination of size 50
+     sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %hu\r\nVar = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
+     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+arm-none-eabi-g++ -o "GIRASOLE.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\ghine\W.I.P\PROGETTIST32\SistemiEmbedded\GIRASOLE\STM32L475VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="GIRASOLE.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+Finished building target: GIRASOLE.elf
+ 
+arm-none-eabi-objdump -h -S  GIRASOLE.elf  > "GIRASOLE.list"
+arm-none-eabi-objcopy  -O binary  GIRASOLE.elf  "GIRASOLE.bin"
 arm-none-eabi-size   GIRASOLE.elf 
    text	   data	    bss	    dec	    hex	filename
-  43532	    124	  10540	  54196	   d3b4	GIRASOLE.elf
+  43548	    124	  10540	  54212	   d3c4	GIRASOLE.elf
 Finished building: default.size.stdout
+Finished building: GIRASOLE.bin
+ 
+ 
+Finished building: GIRASOLE.list
  
 
-15:20:08 Build Finished. 0 errors, 0 warnings. (took 1s.309ms)
+15:54:39 Build Finished. 0 errors, 9 warnings. (took 4s.106ms)
 

@@ -9,6 +9,7 @@ org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:ESSTM32\ Debug\ (5)/activeLaunc
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:ESSTM32\ Debug\ (6)/activeLaunchMode=debug
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:GIRASOLE\ Debug/activeLaunchMode=debug
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:GIRASOLE\ Debug/activeLaunchTarget=null\:---
+org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:GIRASOLE/activeLaunchTarget=null\:---
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:GIRASOLE2\ Debug/activeLaunchMode=debug
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:GIRASOLE2\ Debug/activeLaunchTarget=null\:---
 org.eclipse.cdt.dsf.gdb.gdbRemotedescriptorType\:TEST1\ Debug/activeLaunchMode=debug

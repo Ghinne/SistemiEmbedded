@@ -1177,14 +1177,10 @@ void StartSyncButton(void const * argument)
 	  if (blue_button_pressed) {
 		  // Reset button pressed variable
 		  blue_button_pressed = 0;
-		  // Start semaphore
-		  //startWritePD();
 		  // Set threshold
 		  pd.threshold = pd.leftPanelValue<pd.rightPanelValue?pd.leftPanelValue:pd.rightPanelValue;
 		  // Set variation
 		  pd.variation = abs(pd.leftPanelValue - pd.rightPanelValue);
-		  // Release semaphore
-		  //endWritePD();
 	  }
 	  EndReadButton();
 	  // Delay time (msec)
@@ -1211,9 +1207,8 @@ void StartLedTask1(void const * argument)
 	  int rpv = pd.rightPanelValue;
 	  int var = pd.variation;
 	  int th = pd.threshold;
-	  if (abs(rpv-lpv)<var)//(rpv>th && lpv>th))
+	  if ((abs(rpv-lpv)<var) && (rpv>th && lpv>th))
 	  {
-		  //HAL_GPIO_WritePin(LED3_WIFI__LED4_BLE_GPIO_Port, LED3_WIFI__LED4_BLE_Pin, GPIO_PIN_RESET);
 		  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
 	  }
 	  WriteL1End();
