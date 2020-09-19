@@ -103,7 +103,7 @@
               </ul>
            </ul>
         <p>I thread una volta creati restano attivi operando nel rispetto dell'ordine seguente definito dai semafori.</p>
-        <p><img alt="Image" title="icon" src="GABRY INSERISCI QUI L'IMMAGINE DELLA PARALLEL REGION.png" width="600" height="600" align="center"/></p>
+        <p><img alt="Image" title="icon" src="parallel_regions.png" width="600" height="600" align="center"/></p>
     </p>
   </ul>
    
