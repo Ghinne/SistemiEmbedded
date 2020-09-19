@@ -1,6 +1,26 @@
-15:54:34 **** Incremental Build of configuration Debug for project GIRASOLE ****
+15:57:56 **** Incremental Build of configuration Debug for project GIRASOLE ****
 make -j12 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DDEBUG -DSTM32L475xx -c -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Core/Inc -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc "../Core/Src/stm32l4xx_it.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_DRIVER -DDEBUG -DSTM32L475xx -c -I../Middlewares/Third_Party/FreeRTOS/Source/include -I../Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM4F -I../Drivers/CMSIS/Include -I../Core/Inc -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"Core/Src/stm32l4xx_it.d" -MT"Core/Src/stm32l4xx_it.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/stm32l4xx_it.o"
+../Core/Src/stm32l4xx_it.c: In function 'UART4_IRQHandler':
+../Core/Src/stm32l4xx_it.c:224:32: warning: passing argument 2 of 'HAL_UART_Receive_IT' from incompatible pointer type [-Wincompatible-pointer-types]
+   HAL_UART_Receive_IT(&huart4, Rx_Data, 1);
+                                ^~~~~~~
+In file included from ../Core/Inc/stm32l4xx_hal_conf.h:386:0,
+                 from ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h:30,
+                 from ../Core/Inc/main.h:31,
+                 from ../Core/Src/stm32l4xx_it.c:22:
+../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_uart.h:1595:19: note: expected 'uint8_t * {aka unsigned char *}' but argument is of type 'uint8_t ** {aka unsigned char **}'
+ HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+                   ^~~~~~~~~~~~~~~~~~~
+../Core/Src/stm32l4xx_it.c:227:18: warning: comparison between pointer and integer
+   if (Rx_Data[0] == 'R') {
+                  ^~
+../Core/Src/stm32l4xx_it.c:232:51: warning: implicit declaration of function 'strlen' [-Wimplicit-function-declaration]
+    HAL_UART_Transmit_IT(&huart4, (uint8_t *) msg, strlen(msg));
+                                                   ^~~~~~
+../Core/Src/stm32l4xx_it.c:232:51: warning: incompatible implicit declaration of built-in function 'strlen'
+../Core/Src/stm32l4xx_it.c:232:51: note: include '<string.h>' or provide a declaration of 'strlen'
 ../Core/Src/main.c: In function 'StartSerialDebug':
 ../Core/Src/main.c:1133:2: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
   sprintf(msg, "Light Panel Right = %hu\r\nLight Panel Left = %hu\r\nThr = %hu\r\nVar = %hu\r\n", pd.rightPanelValue, pd.leftPanelValue, pd.threshold, pd.variation);
@@ -13,15 +33,15 @@ arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DUSE_HAL_
 ../Core/Src/main.c:1139:46: warning: incompatible implicit declaration of built-in function 'strlen'
 ../Core/Src/main.c:1139:46: note: include '<string.h>' or provide a declaration of 'strlen'
 ../Core/Src/main.c: In function 'StartSyncButton':
-../Core/Src/main.c:1183:20: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
+../Core/Src/main.c:1184:20: warning: implicit declaration of function 'abs' [-Wimplicit-function-declaration]
      pd.variation = abs(pd.leftPanelValue - pd.rightPanelValue);
                     ^~~
 ../Core/Src/main.c: In function 'StartLedTask2':
-../Core/Src/main.c:1237:8: warning: unused variable 'th' [-Wunused-variable]
+../Core/Src/main.c:1245:8: warning: unused variable 'th' [-Wunused-variable]
     int th = pd.threshold;
         ^~
 ../Core/Src/main.c: In function 'StartLedTask3':
-../Core/Src/main.c:1266:8: warning: unused variable 'th' [-Wunused-variable]
+../Core/Src/main.c:1281:8: warning: unused variable 'th' [-Wunused-variable]
     int th = pd.threshold;
         ^~
 ../Core/Src/main.c: In function 'StartSerialDebug':
@@ -56,7 +76,7 @@ arm-none-eabi-objdump -h -S  GIRASOLE.elf  > "GIRASOLE.list"
 arm-none-eabi-objcopy  -O binary  GIRASOLE.elf  "GIRASOLE.bin"
 arm-none-eabi-size   GIRASOLE.elf 
    text	   data	    bss	    dec	    hex	filename
-  43548	    124	  10540	  54212	   d3c4	GIRASOLE.elf
+  43516	    124	  10540	  54180	   d3a4	GIRASOLE.elf
 Finished building: default.size.stdout
 Finished building: GIRASOLE.bin
  
@@ -64,5 +84,5 @@ Finished building: GIRASOLE.bin
 Finished building: GIRASOLE.list
  
 
-15:54:39 Build Finished. 0 errors, 9 warnings. (took 4s.106ms)
+15:58:00 Build Finished. 0 errors, 13 warnings. (took 4s.363ms)
 

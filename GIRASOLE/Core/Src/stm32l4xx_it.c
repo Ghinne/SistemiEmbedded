@@ -197,8 +197,10 @@ void TIM1_UP_TIM16_IRQHandler(void)
 void EXTI15_10_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
+  // If blue button is pressed
   if(__HAL_GPIO_EXTI_GET_FLAG(GPIO_PIN_13)){
-	  blue_button_pressed = 1; // toggle blue button pressed
+	  // Set flag
+	  blue_button_pressed = 1;
   }
   /* USER CODE END EXTI15_10_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
@@ -221,10 +223,14 @@ void UART4_IRQHandler(void)
   /* USER CODE BEGIN UART4_IRQn 1 */
   HAL_UART_Receive_IT(&huart4, Rx_Data, 1);
 
+  // If received value is 'R'
   if (Rx_Data[0] == 'R') {
+	  // Set flag
 	  blue_button_pressed = 1;
+	  // Send message
 	  char* msg = "Soglia modificata!\n";
 	  HAL_UART_Transmit_IT(&huart4, (uint8_t *) msg, strlen(msg));
+	  // Clear buffer
 	  Rx_Data[0] = '\0';
   }
   /* USER CODE END UART4_IRQn 1 */

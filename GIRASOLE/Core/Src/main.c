@@ -183,6 +183,7 @@ int main(void)
   MX_ADC2_Init();
   MX_UART4_Init();
   /* USER CODE BEGIN 2 */
+  // Enable huart4 interrupt mode
   __HAL_UART_ENABLE_IT(&huart4, UART_IT_RXNE);
   __HAL_UART_ENABLE_IT(&huart4, UART_IT_TC);
   /* USER CODE END 2 */
@@ -191,10 +192,6 @@ int main(void)
   /* definition and creation of MutexPD */
   osMutexDef(MutexPD);
   MutexPDHandle = osMutexCreate(osMutex(MutexPD));
-
-  /* definition and creation of panelsMutex */
-  osMutexDef(panelsMutex);
-  panelsMutexHandle = osMutexCreate(osMutex(panelsMutex));
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -1068,10 +1065,11 @@ void StartReadLeftPanel(void const * argument)
 	for(;;)
 	{
 		ReadLPStart();
-
-		 // Get left panel value
+		// Get left panel value
 		HAL_ADC_Start(&hadc2);
+		// Convert value into integer
 		HAL_ADC_PollForConversion(&hadc2, HAL_MAX_DELAY);
+		// Get percent value of it
 		pd.leftPanelValue = HAL_ADC_GetValue(&hadc2)*100/2400;
 
 		ReadLPEnd();
@@ -1096,9 +1094,11 @@ void StartReadRightPanel(void const * argument)
   for(;;)
   {
 	ReadRPStart();
-	 // Get right panel value
+	// Get right panel value
 	HAL_ADC_Start(&hadc1);
+	// Convert value into integer
 	HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
+	// Get percent value of it
 	pd.rightPanelValue = HAL_ADC_GetValue(&hadc1)*100/2400;
 
 	ReadRPEnd();
@@ -1174,8 +1174,9 @@ void StartSyncButton(void const * argument)
   for(;;)
   {
 	  StartReadButton();
+	  // If interrupt on button of huart4 occurred this value will be 1
 	  if (blue_button_pressed) {
-		  // Reset button pressed variable
+		  // Reset flag
 		  blue_button_pressed = 0;
 		  // Set threshold
 		  pd.threshold = pd.leftPanelValue<pd.rightPanelValue?pd.leftPanelValue:pd.rightPanelValue;
@@ -1203,15 +1204,21 @@ void StartLedTask1(void const * argument)
   for(;;)
   {
 	  WriteL1Start();
+	  // Get values from data structure
 	  int lpv = pd.leftPanelValue;
 	  int rpv = pd.rightPanelValue;
 	  int var = pd.variation;
 	  int th = pd.threshold;
+	  /**If variance between panels values is lower than threshold one
+	   * and right and left panel values are higher than minimum threshold
+	   */
 	  if ((abs(rpv-lpv)<var) && (rpv>th && lpv>th))
 	  {
+		  // Turn on green led
 		  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
 	  }
 	  WriteL1End();
+	  // Delay time (msec)
 	  osDelay(100);
   }
   /* USER CODE END StartLedTask1 */
@@ -1231,16 +1238,23 @@ void StartLedTask2(void const * argument)
   for(;;)
   {
 	  WriteL2Start();
+	  // Get values from data structure
 	  int lpv = pd.leftPanelValue;
 	  int rpv = pd.rightPanelValue;
 	  int var = pd.variation;
 	  int th = pd.threshold;
+	  /**If variance between panels values is higher than threshold one
+	   * and right panel value is higher than left one
+	   */
 	  if (abs(rpv-lpv)>var && (rpv>=lpv))
 	  {
+		  // Turn off green led
 		  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
-	  	  HAL_GPIO_WritePin(LED3_WIFI__LED4_BLE_GPIO_Port, LED3_WIFI__LED4_BLE_Pin, GPIO_PIN_SET);
+	  	  // Turn on blue led
+		  HAL_GPIO_WritePin(LED3_WIFI__LED4_BLE_GPIO_Port, LED3_WIFI__LED4_BLE_Pin, GPIO_PIN_SET);
 	  }
 	  WriteL2End();
+	  // Delay time (msec)
 	  osDelay(100);
   }
   /* USER CODE END StartLedTask2 */
@@ -1260,16 +1274,23 @@ void StartLedTask3(void const * argument)
   for(;;)
   {
 	  WriteL3Start();
+	  // Get values from data structure
 	  int lpv = pd.leftPanelValue;
 	  int rpv = pd.rightPanelValue;
 	  int var = pd.variation;
 	  int th = pd.threshold;
+	  /**If variance between panels values is higher than threshold one
+	   * and right panel value is lower than left one
+	   */
 	  if (abs(rpv-lpv)>var && rpv<lpv)
 	  {
+		  // Turn off green light
 		  HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
+		  // Turn on yellow light
 		  HAL_GPIO_WritePin(LED3_WIFI__LED4_BLE_GPIO_Port, LED3_WIFI__LED4_BLE_Pin, GPIO_PIN_RESET);
 	  }
 	  WriteL3End();
+	  // Delay time (msec)
 	  osDelay(100);
   }
   /* USER CODE END StartLedTask3 */
