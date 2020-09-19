@@ -869,6 +869,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+//function that posts all led tasks
 void PostLedTasks()
 {
     if (pcm.l1w)
@@ -890,6 +891,7 @@ void PostLedTasks()
     }
 }
 
+//function that post all panel tasks
 void PostPanelTasks()
 {
     if (pcm.lpw)
@@ -908,6 +910,7 @@ void PostPanelTasks()
 void ReadLPStart()
 {
 	osMutexWait(MutexPDHandle, osWaitForever);
+	//if left panel task has done must waits next cycle
 	if (pcm.lpanel_done)
 		pcm.lpw++;
 	else
@@ -919,6 +922,7 @@ void ReadLPStart()
 void ReadLPEnd()
 {
 	osMutexWait(MutexPDHandle, osWaitForever);
+	//left panel has done. If every panels has done button task is awaked
 	pcm.lpanel_done = 1;
 	if (pcm.lpanel_done && pcm.rpanel_done)
 	{
@@ -935,6 +939,7 @@ void ReadLPEnd()
 void ReadRPStart()
 {
 	osMutexWait(MutexPDHandle, osWaitForever);
+	//if right panel task has done must waits next cycle
 	if (pcm.rpanel_done)
 		pcm.rpw++;
 	else
@@ -946,6 +951,7 @@ void ReadRPStart()
 void ReadRPEnd()
 {
 	osMutexWait(MutexPDHandle, osWaitForever);
+	//right panel has done. If every panels has done button task is awaked
 	pcm.rpanel_done = 1;
 	if (pcm.lpanel_done && pcm.rpanel_done)
 	{
@@ -962,6 +968,7 @@ void ReadRPEnd()
 void WriteL1Start()
 {
 	osMutexWait(MutexPDHandle, osWaitForever);
+	//if led1 has done must waits next cycle
 	if (pcm.led1_done)
 		pcm.l1w++;
 	else
@@ -973,6 +980,7 @@ void WriteL1Start()
 void WriteL2Start()
 {
 	osMutexWait(MutexPDHandle, osWaitForever);
+	//if led2 has done must waits next cycle
 	if (pcm.led2_done)
 		pcm.l2w++;
 	else
@@ -984,6 +992,7 @@ void WriteL2Start()
 void WriteL3Start()
 {
 	osMutexWait(MutexPDHandle, osWaitForever);
+	//if led3 has done must waits next cycle
 	if (pcm.led3_done)
 		pcm.l3w++;
 	else
@@ -995,10 +1004,12 @@ void WriteL3Start()
 void WriteL1End()
 {
 	osMutexWait(MutexPDHandle, osWaitForever);
+	//when led1 task has done, led1_done is setted true.
+	//if all the led tasks are done panel tasks are awaked
 	pcm.led1_done = 1;
 	if (pcm.led1_done && pcm.led2_done && pcm.led3_done)
 	{
-		pcm.lpanel_done = pcm.rpanel_done = 0; //sblocco i pannelli
+		pcm.lpanel_done = pcm.rpanel_done = 0;
 		PostPanelTasks();
 	}
 	osMutexRelease(MutexPDHandle);
@@ -1007,10 +1018,12 @@ void WriteL1End()
 void WriteL2End()
 {
 	osMutexWait(MutexPDHandle, osWaitForever);
+	//when led2 task has done, led1_done is setted true.
+	//if all the led tasks are done panel tasks are awaked
 	pcm.led2_done = 1;
 	if (pcm.led1_done && pcm.led2_done && pcm.led3_done)
 	{
-		pcm.lpanel_done = pcm.rpanel_done = 0; //sblocco i pannelli
+		pcm.lpanel_done = pcm.rpanel_done = 0; //set panels undone for the next cycle
 		PostPanelTasks();
 	}
 	osMutexRelease(MutexPDHandle);
@@ -1019,10 +1032,12 @@ void WriteL2End()
 void WriteL3End()
 {
 	osMutexWait(MutexPDHandle, osWaitForever);
+	//when led3 task has done, led1_done is setted true.
+	//if all the led tasks are done panel tasks are awaked
 	pcm.led3_done = 1;
 	if (pcm.led1_done && pcm.led2_done && pcm.led3_done)
 	{
-		pcm.lpanel_done = pcm.rpanel_done = 0; //sblocco i pannelli
+		pcm.lpanel_done = pcm.rpanel_done = 0;
 		PostPanelTasks();
 	}
 	osMutexRelease(MutexPDHandle);
@@ -1031,6 +1046,7 @@ void WriteL3End()
 void StartReadButton()
 {
 	osMutexWait(MutexPDHandle, osWaitForever);
+
 	if (pcm.button_can_do)
 		osSemaphoreRelease(button_semHandle);
 	else
@@ -1042,9 +1058,11 @@ void StartReadButton()
 void EndReadButton()
 {
 	osMutexWait(MutexPDHandle, osWaitForever);
-	pcm.button_can_do = 0; //non può andare
-	pcm.button_wait = 0; //non è più in attesa
-	pcm.led1_done = pcm.led2_done = pcm.led3_done = 0; //indico che devono eseguire i led
+	//button task now waits the next cycle
+	pcm.button_can_do = 0;
+	pcm.button_wait = 0;
+	//unlock led tasks
+	pcm.led1_done = pcm.led2_done = pcm.led3_done = 0;
 	PostLedTasks();
 	osMutexRelease(MutexPDHandle);
 }
