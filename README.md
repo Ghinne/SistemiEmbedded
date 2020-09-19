@@ -45,10 +45,9 @@
       <ul>
         <li>La struttura dati per le letture dei diversi pannelli;</li>
         <li>Gli interrupt handler che si occupano di gestire gli interrupt relativi all'aggiornamento delle soglie (pulsante blu, carattere 'R' via bluetooth);
-        <li>I mutex:
+        <li>Il mutex:
           <ul>
-            <li>MUTEX 1 GABRY </li>
-            <li>MUTEX 2 GABRY </li>
+            <p>Garantisce l'accesso in mutuale esclusione alla struttura dati per evitare conflitti.</p>
           </ul>
         <li>I thread:
           <ul>
